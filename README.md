@@ -9,8 +9,9 @@ We are going to see in details:
 Creation of the subset
 Replication of the experiment in this subset and then seeing what are the results of the DFT
 
+**N.B.** I took inspiration and adapted the Train and Test Loop skeletons from one of my previous projects in which I worked and collaborated in: https://github.com/cybernetic-m/DAgger4Robotics
 
-METTERE LE 3 IMMAGINI
+However I did significant changes in order to adapt those skeletons to this work
 
 
 # References

@@ -11,7 +11,7 @@ In this project, we are going further:
 We trained the models in the Google Colab Environment (in particular on T4 and A100 GPUs) as we did not have access to powerful local machines. The drowback is that in every session we need to re-load the Dataset in the /content/, and this is impractical if we are using the complete RRDataset which size is around 20 GB. Also loading the Dataset in Google Drive is impractical as, during training, most of the time would be lost in I/O passages between Colab and Drive.
 Thus, the more convinient solution was:
 1) The Creation of a subset of 9000 Images (3.4 GB)
-2) The Compression of this subset (this does not reduce the size, but it is faster in exchaning files)
+2) The Compression of this subset (this does not reduce the size, but the next steps will be faster).
 3) The Saving of this archive in the Local Drive
 4) The Download of this archive in the /content/ of Google Colab
 5) The Extraction of this archive
@@ -31,9 +31,14 @@ Then, during training, each macro-category of 1500 photos is divided in three se
 -  train set 70% (in total 6300=6*1050)
 -  validation set 15% (in total 1350=6*225)
 -  test set 15% (in total 1350=6*225)
+
 This ensures split balance both in real/fake classes and transformation categories.
 
 Steps 1-2-3 are done separately in this [notebook]()
+
+Another important features is the possibility to choose between **Lazy Loading** and **Eager Loading**:
+- With **Lazy Loading** the DataLoader will re-load the image and re-compute the DFT Amplitude every time the image is requested. With A100 GPU, every epoch it loses about 40/50 seconds in this process.
+- With **Eager Loading** the DataLoader will load and compute the DFT Amplitude of the image at the beginning and then it will store them in the GPU memory. With A100 GPU the Eager loading lasts 4 minutes, but then we recover 40/50 seconds in each epoch of training. The drowaback is that we need around 17/18 GB of VRAM of the GPU. 
 
 The subset archive can be downloaded [here](https://drive.google.com/file/d/1Y9WJSk2nGYXYGO9T6PcgerI0cK-aGbHn/view?usp=sharing), while the folder of the original RRDataset can be seen [here](https://drive.google.com/drive/folders/1fTFIHXxDNseudhx9EJI-QoA0ZtzvGv8O?usp=sharing)
 

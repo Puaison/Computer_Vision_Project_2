@@ -1,8 +1,14 @@
 # Project 2: Joint Detection of AI-Generated Images and Post-Processing Alterations in Real-World Scenarios
 ## Abstract:
-AI-Generated Image stae-of-the-art detectors are usally trained in idealized conditions. But in the real world, images goes through a lot of post-processing transformations, which can introduce a degradation signature in the image-pattern and lead the detectors in error. In this context it is inserted the work of [Li et al. (2025)](#li2025), which took most of the state-of-the-art detectors, fine-tuned them on their Dataset (representing the same images but first in the ideal scenario, then after transmitting them through the internet and after some redigitalization process) and analizing how the detection real/fake changed across the transformation (in respect to the ideal scenario).
-In this project, we are going further:
+AI-Generated Image detectors are usually trained in idealized conditions. But in the real world, images goes through a lot of post-processing transformations, which can introduce a degradation signature in the image-pattern and lead the detectors in error. In this context it is inserted the work of [Li et al. (2025)](#li2025): They created a new Dataset (called RRDataset) containing images in three different format categories: in their original format, in the modified format due to the transmition through the internet, and in the modified format due to the redigitalization process. They took most state-of-the-art detectors, fine-tuned them on their Dataset contaning these eterogeneous images and analized how the detection real/fake changed across the transformations (in respect to the origianl scenario).
 
+In this project, we are going further:
+- We tried not only to classify Real/AI Images across different transformations, but also to identify the category format to which the images belong; we analyzed if one task can benefit from the features and model-weights learned from the opposite task or if they compete, resulting in the degradation of both tasks' performance during joint-training. 
+- We adapted the state-of-the-art [DRCTConvNext_Base](#chen2024drct) in order to take in input not only the RGB-values but also the amplitude of the Discrete Fourier Transform, following the hypothesis that some post-processing transformations can leave a mark in the spectrum (like low-pass or high-pass filters).
+
+## Dataset
+
+## Other stuffs
 We introduce a second head which has the role of detecting which type of transformation the image was subjected, and then 
 I modified the the best network found in the Benchamrk of [[1]](#li2025) (that is [DRCTConvB](#chen2024drct)) in order to add a Parallel STEM on DFT, and then sum the feature maps of this stem with the feature maps of the RGB stem. The hypothesis is that, for understanding what type of transformation the image is undergone, some of these information can be in the DFT magnitude. And in order to indicate to the Network if the magnitude in the recptive field is a high-frequency or low-fre, we overlapped with a Radial Map.
 We are going to see in details:

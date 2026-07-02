@@ -4,7 +4,7 @@ AI-Generated Image detectors are usually trained in idealized conditions. But in
 
 In this project, we are going further:
 - We tried not only to classify Real/AI Images across different transformations, but also to identify the category format to which the images belong; we analyzed if one task can benefit from the features and model-weights learned from the opposite task or if they compete, resulting in the degradation of both tasks' performance during joint-training. 
-- We adapted the state-of-the-art [DRCTConvNext_Base](#chen2024drct) (which is the best in the [1](#li2025) work) in order to take in input not only the RGB-values but also the amplitude of the Discrete Fourier Transform, following the hypothesis that some post-processing transformations can leave a mark in the spectrum (like low-pass or high-pass filters).
+- We adapted the state-of-the-art [DRCTConvNext_Base](#chen2024drct) (which is the best in the [[1]](#li2025) work) in order to take in input not only the RGB-values but also the amplitude of the Discrete Fourier Transform, following the hypothesis that some post-processing transformations can leave a mark in the spectrum (like low-pass or high-pass filters).
 
 
 ## Dataset
@@ -43,6 +43,13 @@ Another important features is the possibility to choose between **Lazy Loading**
 The subset archive can be downloaded [here](https://drive.google.com/file/d/1Y9WJSk2nGYXYGO9T6PcgerI0cK-aGbHn/view?usp=sharing), while the folder of the original RRDataset can be seen [here](https://drive.google.com/drive/folders/1fTFIHXxDNseudhx9EJI-QoA0ZtzvGv8O?usp=sharing)
 
 ## Network
+As mentioned in the abstract, in this project We propose a new model based on the [DRCTConvNext_Base](#chen2024drct) that takes in input not only RGB features, but also the DFT Amplitude features. The name is DRCTConvNext_Base_DFT (abbreviated DRCTConvB_DFT). We compared both models on the two tasks separately and jointly. We found out that this modification improved slightly the classification Real/Ai task, but when combined with the transformation classification, it outperformed the DRCTConvNext_Base. This confirms the hypothesis that the study of the spectrum really helped the network in understanding the transformation category. We will show the results in the **Results** chapter; In this chapter we are going to describe in details the Architecture and the modifications.
+
+The first thing that we need to analyze is the base model that the paper [DRCT](#chen2024drct) modified, that is [ConvNext_Base](#convnext). It is a variant of the ConvNeXt family, CNN-ResNet based models that tries to achieve the same results of Vision Transformers by gradually modifying themselves with some ideas that became popular and common in the ViT. The result is a CNN Model that can compete with Transformers in vision tasks.
+
+Then the author of [DRCT](#chen2024drct) transformed the [ConvNext_Base](#convnext) head in a features extractor and glued a new head that has 2 as output-dimension. Finally they trained it to became a detector of AI Images.
+
+The authors of [RRDataset](#li2025) found out that this is the best model to be fine-tuned and used in real world scenario.
 
 
 ## Other stuffs
@@ -73,3 +80,8 @@ arXiv preprint arXiv:2509.09172, 2025.
 in Proceedings of the 41st International Conference on Machine Learning (ICML),
 vol. 235, pp. 7621–7639, 2024.
 [Paper Page](https://proceedings.mlr.press/v235/chen24ay.html), [PDF](https://raw.githubusercontent.com/mlresearch/v235/main/assets/chen24ay/chen24ay.pdf)
+
+<a id="convnext"></a>
+[3] Z. Liu, H. Mao, C.-Y. Wu, C. Feichtenhofer, T. Darrell, and S. Xie,
+“A ConvNet for the 2020s,” arXiv preprint arXiv:2201.03545, 2022.
+[Paper on arXiv](https://arxiv.org/abs/2201.03545)

@@ -46,19 +46,35 @@ The subset archive can be downloaded [here](https://drive.google.com/file/d/1Y9W
 As mentioned in the abstract, in this project We propose a new model based on the [DRCTConvNext_Base](#chen2024drct) that takes in input not only RGB features, but also the DFT Amplitude features. The name is DRCTConvNext_Base_DFT (abbreviated DRCTConvB_DFT). We compared both models on the two tasks separately and jointly. We found out that this modification improved slightly the classification Real/Ai task, but when combined with the transformation classification, it outperformed the DRCTConvNext_Base. This confirms the hypothesis that the study of the spectrum really helped the network in understanding the transformation category. We will show the results in the **Results** chapter; In this chapter we are going to describe in details the Architecture and the modifications.
 
 The first thing that we need to analyze is the base model that the paper [DRCT](#chen2024drct) modified, that is [ConvNext_Base](#convnext). It is a variant of the ConvNeXt family, CNN-ResNet based models that tries to achieve the same results of Vision Transformers by gradually modifying themselves with some ideas that became popular and common in the ViT. The result is a CNN Model that can compete with Transformers in vision tasks.
+<a id="ConvNeXt_architecture"></a>
 <p align="center">
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Base_Model_centered.jpg" alt="BaseConvNeXt" width="200">
+  <br>
+  <sub>
+    <b>Figure 1:</b> ConvNeXt Base architecture.
+  </sub>
 </p>
 
 Then the author of [DRCT](#chen2024drct) transformed the [ConvNext_Base](#convnext) head in a features extractor and glued a new head that has 2 as output-dimension (the beige block in the image below). Finally they trained it to became a detector of AI Images.
 
+<a id="DRCT_architecture"></a>
 <p align="center">
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/DRCT_Detector_centered.jpg" alt="Model architecture" width="200">
+  <br>
+  <sub>
+    <b>Figure 2:</b> DRCTConvB model detector.
+  </sub>
 </p>
 
 The authors of [RRDataset](#li2025) found out that this is the best model to be fine-tuned and used in real world detection of AI Images.
+
+<a id="prposed_architecture"></a>
 <p align="center">
-  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/DFT_model_centered.jpg" alt="Model architecture" width="500">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/DFT_model_centered.jpg" alt="Model architecture" width="600">
+  <br>
+  <sub>
+    <b>Figure 3:</b> Proposed multi-head architecture based on DRCTConvB, combining RGB and DFT-based features.
+  </sub>
 </p>
 
 

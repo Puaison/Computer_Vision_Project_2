@@ -82,10 +82,49 @@ Below there is the complete structure of the proposed model with the two differe
 </p>
 
 ## Loss function
-The loss used for both the two task is the CrossEntropy. Despite when trained singularly there is no necessity to normalize to the same scale the loss, while comparing a binary with a ternary loss is necessary a normalization.
-For this motivation, I decided to use the normalized 
+The loss used for both the two task is the CrossEntropy, i.e.:
+
+$$
+CE(y, \hat{y}) = - \log(\hat{y}_{y})
+$$
+where $ \hat{y}_{y} $ is the probability predicted of the correct class assigned to y by the model 
+Despite when trained singularly there is no necessity to normalize to the same scale the loss, while comparing a binary with a ternary loss is necessary a normalization.
+In fact, when the model assigns uniformely the sample to all the K classes of the problem, it will produce. 
+
+$$
+CE(y, \hat{y}) = - \log(\frac{1}{K}) = \log(K)
+$$
+
+
+Then we obtain that:
+
+$$
+CE_{\mathrm{norm}} =\frac{CE(y, \hat{y})}{\log(K)} 
+$$
+
+When the model assign the probability uniformily, then $CE_{\mathrm{norm}}=1$
+
+The combined weighted loss for the joint tasks detection is given by:
+
+$$
+\mathcal{L} =
+\frac{
+w_{\mathrm{AI/R}} \cdot CE_{\mathrm{class,norm}}
++
+w_{\mathrm{cat}} \cdot CE_{\mathrm{cat,norm}}
+}
+{
+w_{\mathrm{AI/R}} + w_{\mathrm{cat}}
+}
+$$
+
+
 
 ## Experiments
+
+**N.B.** I took inspiration and adapted the Train and Test Loop skeletons from one of my previous projects in which I worked and collaborated in: https://github.com/cybernetic-m/DAgger4Robotics
+
+However I did significant changes in order to adapt those skeletons to this work
 
 ## Results
 
@@ -101,10 +140,6 @@ I modified the the best network found in the Benchamrk of [[1]](#li2025) (that i
 We are going to see in details:
 Creation of the subset
 Replication of the experiment in this subset and then seeing what are the results of the DFT
-
-**N.B.** I took inspiration and adapted the Train and Test Loop skeletons from one of my previous projects in which I worked and collaborated in: https://github.com/cybernetic-m/DAgger4Robotics
-
-However I did significant changes in order to adapt those skeletons to this work
 
 
 # References

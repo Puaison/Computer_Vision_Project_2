@@ -69,7 +69,7 @@ Then the author of [DRCT](#chen2024drct) transformed the [ConvNext_Base](#convne
 In the work of [RRDataset](#li2025), the authors found out that this is the best model to be fine-tuned and used in real world detection of AI Images that can be degraded.
 
 
-And now we come to **DRCTConvB_DFT**: as in this project we want to predict also the post-processing transformation, I added also a STEM that is the copy in size and layers of the STEM in the referred model. But in input we cannot pass only a DFT, as Convolutional Layer are not capable of distinguish in which portion of the image the patch was taken, and then could be impossible to distinguish between low frequencies and high frequencies. For this motivation, we concatenate in the channels a **Normalized Radial Map**, a special images that in each pixel there is the distance from the center, and then the STEM branch can associate the DFT Amplitude portion to a particular frequency. At the end, the feature maps of the DFT branch are summed pixel-wise with the feature maps of the RGB original STEM branch and then they continue together the flow in the network. The new added head takes in input the same embeddings of the Real/Ai Head, but it return 3 logits.
+And now we come to **DRCTConvB_DFT**: as in this project we want to predict also the post-processing transformation, I added also a Stem that is the copy in size and layers of the Stem in the referred model. But in input we cannot pass only a DFT, as Convolutional Layer are not capable of distinguish in which portion of the image the patch was taken, and then could be impossible to distinguish between low frequencies and high frequencies. For this motivation, we concatenate in the channels a **Normalized Radial Map**, a special images that in each pixel there is the distance from the center, and then the Stem branch can associate the DFT Amplitude portion to a particular frequency. At the end, the feature maps of the DFT branch are summed pixel-wise with the feature maps of the RGB original Stem branch and then they continue together the flow in the network. The new added head takes in input the same embeddings of the Real/Ai Head, but it return 3 logits.
 
 Below there is the complete structure of the proposed model with the two different heads. The block marked with green are the blocks that I added.
 <a id="prposed_architecture"></a>
@@ -128,7 +128,7 @@ However I did significant changes in order to adapt those skeletons to this work
 </br>
 </br>
 </br>
-In this section we are going to describe the setup for the experiments done. We used our proposed model and the DRCTConvB detector.
+In this section we are going to describe the setup for the experiments done. We used our proposed model with DFT Stem and the DRCTConvB detector.
 
 **Single Head Classification Real/AI task** (from now we will refer to as **class task**):
 - Starting from the [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) we fine tuned the DRCTConvB model on the Subset created from the RRDataset and used only the class AI/Real loss. We will call this checkpoint from now on as [RGB ONLY CLASS TASK CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing)
@@ -137,7 +137,7 @@ In this section we are going to describe the setup for the experiments done. We 
 
 Brief result: The [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) without fine-tuning is really bad in the detection of AI images. Instead, our proposed model reached satisfying values and slightly outperformed the [DRCTConvB Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with fine tuning
 
-**Multihead fine-tuning of both models starting from our checkpoints of the previous Single Head class tarining task ([RGB ONLY CLASS TASK CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing) and [DFT CLASS TASK CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link)**):
+**Multihead fine-tuning of both models starting from our checkpoints of the previous Single Head class training task ([RGB ONLY CLASS TASK CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing) and [DFT CLASS TASK CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link)**):
 We glued the second head and divided the process of fine tuning in two steps:
 1) freezed all the model (for 4 epochs) apart from the new head and used only the category loss in order to train the new head to adapt to the features learned for the classification REal/AI task
 2) Unlocked all the parts of the model and trained combined the two heads with $ w_{\mathrm{AI/R}} = 0.1 $ (as being already trained to detect fake images) and $ w_{cat} = 1 $. Moreover we set different learning rates fot the parts of the model. For example for the **class task** head we give a very low learning rate as we don't want to disrupt the learned features.
@@ -173,6 +173,13 @@ Brief result: We confirmed that the category task benefits and highly depends fr
 
 
 ## Results
+In this section we are going to show the metrics and performances of the five experiments conducted. Our proposed model will be higlited in blue.
+
+### **Single Head Classification Real/AI task**
+
+
+
+
 
 
 
@@ -181,7 +188,7 @@ Brief result: We confirmed that the category task benefits and highly depends fr
 
 ## Other stuffs
 We introduce a second head which has the role of detecting which type of transformation the image was subjected, and then 
-I modified the the best network found in the Benchamrk of [[1]](#li2025) (that is [DRCTConvB](#chen2024drct)) in order to add a Parallel STEM on DFT, and then sum the feature maps of this stem with the feature maps of the RGB stem. The hypothesis is that, for understanding what type of transformation the image is undergone, some of these information can be in the DFT magnitude. And in order to indicate to the Network if the magnitude in the recptive field is a high-frequency or low-fre, we overlapped with a Radial Map.
+I modified the the best network found in the Benchamrk of [[1]](#li2025) (that is [DRCTConvB](#chen2024drct)) in order to add a Parallel Stem on DFT, and then sum the feature maps of this Stem with the feature maps of the RGB Stem. The hypothesis is that, for understanding what type of transformation the image is undergone, some of these information can be in the DFT magnitude. And in order to indicate to the Network if the magnitude in the recptive field is a high-frequency or low-fre, we overlapped with a Radial Map.
 We are going to see in details:
 Creation of the subset
 Replication of the experiment in this subset and then seeing what are the results of the DFT

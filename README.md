@@ -268,7 +268,14 @@ In [table 15](#table_15) and [table 16](#table_16) are reported the metrics for 
 </p>
 
 But what is important to note is in the training process:
-By looking at the [graphs](#) of the training, regardless of the weight assigned to the Category term, it follows the velocity learning of the Class term. In fact, when the weight contribution regarding the class is very low, the category loss reached the amount of 0.20 only in the 6-th epoch (altough it had a very big weight), while in the other weightening configuration reached that value on the 3-th and 5-th epoch (even the weight was really low). This confirms that the category task is "leeching" from the class task.
+By looking at the [training graphs](#graphs), regardless of the weight assigned to the Category term, it follows the velocity learning of the Class term. In fact, when the weight contribution regarding the class is very low, the category loss reached the amount of 0.20 only in the 6-th epoch (altough it had a very big weight), while in the other weightening configuration reached that value on the epochs before (even if the weight was really low). This confirms that the category task is "leeching" from the class task.
+
+<a id="graphs"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Graphs.png" alt="loss weights" width="1600">
+</p>
+
+
 
 In [table 17](#table_17), we can notice that there is a general trend between the different configuration of weightings that in redigital and transfer category it is more powerful in detecting AI images but less powerful in detecting Real Images. 
 <a id="table_17"></a>

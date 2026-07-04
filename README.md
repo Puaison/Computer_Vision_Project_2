@@ -178,32 +178,103 @@ Brief result: We confirmed that the category task benefits and highly depends fr
 In this section we are going to show the metrics and performances of the five experiments conducted. Our proposed model will be higlited in blue.
 
 ### **Single Head Classification Real/AI task**
-The results on test and validation sets are reported in [table 2](#). The principal conclusion is that our proposed model is more performant in accuracy, but it has more uncertainty due to the higher loss. Instead, by using the DRCT BASE CHECKPOINT without fine tuning we can observe that the accuracy is really low, and by looking at [table 3](#) it is pratically predicting all images like true, regardless of category transformation
+The results on test and validation sets are reported in [table 2](#table_2). The principal conclusion is that our proposed model is more performant in accuracy, but it has more uncertainty due to the higher loss. Instead, by using the DRCT BASE CHECKPOINT without fine tuning we can observe that the accuracy is really low, and by looking at [table 3](#table_3) it is pratically predicting all images like true, regardless of category transformation
+<a id="table_2"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_2.png" alt="loss weights" width="800">
+</p>
 
-By breaking down real/fake detection accuracy separately foreach transformation category for RGB ONLY CLASS TASK CHECKPOINT in [table 4](#) and DFT CLASS TASK CHECKPOINT in [table 5](#) we can assert that both models are more performant in redigital category (w.r.t the original category) while lose something on the transfer category (in particular our proposed model)
+<a id="table_3"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_3.png" alt="loss weights" width="800">
+</p>
 
-Then in order to analyze if our proposed model was really using the DFT Stem, we set to zero the weights of the parallel DFT branch and compared how the prediction in the test set changed. In particular by looking at [table 6](#) and [table 7](#), it is possible to note that there is a little increment in the fake detection in all categories, but we lost a very important accuracy score in the Real detection for all categories. This means that our proposed model is effectively using and learning the DFT Stem.
+By breaking down real/fake detection accuracy separately foreach transformation category for RGB ONLY CLASS TASK CHECKPOINT in [table 4](#table_4) and DFT CLASS TASK CHECKPOINT in [table 5](#table_5) we can assert that both models are more performant in redigital category (w.r.t the original category) while lose something on the transfer category (in particular our proposed model)
+
+<a id="table_4"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_4.png" alt="loss weights" width="800">
+</p>
+
+<a id="table_5"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_5.png" alt="loss weights" width="800">
+</p>
+
+Then in order to analyze if our proposed model was really using the DFT Stem, we set to zero the weights of the parallel DFT branch and compared how the prediction in the test set changed. In particular by looking at [table 6](#table_6) and [table 7](#table_7), it is possible to note that there is a little increment in the fake detection in all categories, but we lost a very important accuracy score in the Real detection for all categories. This means that our proposed model is effectively using and learning the DFT Stem.
+<a id="table_6"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_6.png" alt="loss weights" width="800">
+</p>
+
+<a id="table_7"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_7.png" alt="loss weights" width="800">
+</p>
 
 ### **Multihead fine-tuning of both models starting from our checkpoints of the previous unimodal class training task ([RGB ONLY CLASS TASK CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing) and [DFT CLASS TASK CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link)**)
 
-By looking at the [table 8](#) we can assert that our proposed model is more performing in respect to the DRCTConvB base model (despite it has more uncertainty). In particular it is important to note that thanks to the new DFT Stem branch, our model is hugely particularly more accurated and balanced in category recognition (+18,37 in accuracy and +27,56 in F1-macro) and this confirm our initial hypothesis that it is more simple to detect post-processing transformation by looking also to the spectrum.
+By looking at the [table 8](#table_8) we can assert that our proposed model is more performing in respect to the DRCTConvB base model (despite it has more uncertainty). In particular it is important to note that thanks to the new DFT Stem branch, our model is hugely particularly more accurated and balanced in category recognition (+18,37 in accuracy and +27,56 in F1-macro) and this confirm our initial hypothesis that it is more simple to detect post-processing transformation by looking also to the spectrum.
 
-In [table 9](#) are also reported the metrics for Test set, that confirms what we have seen in the validation set.
+<a id="table_8"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_8.png" alt="loss weights" width="800">
+</p>
+
+In [table 9](#table_9) are also reported the metrics for Test set, that confirms what we have seen in the validation set.
+<a id="table_9"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_9.png" alt="loss weights" width="800">
+</p>
 
 ### **SingleHead Category transformation detection task**
-In [table 10](#) and [table 11](#) are reported the metrics for Validation set and Test set respectively. The first thing we can note is that starting from a checkpoint trained on Real/Fake unimodal task, it can reach better accuracies and security on the category task, althought the process unlearned the class task. This suggests that Category task can effectively benefit from the embeddings learned during the class task
+In [table 10](#table_10) and [table 11](#table_11) are reported the metrics for Validation set and Test set respectively. The first thing we can note is that starting from a checkpoint trained on Real/Fake unimodal task, it can reach better accuracies and security on the category task, althought the process unlearned the class task. This suggests that Category task can effectively benefit from the embeddings learned during the class task
+<a id="table_10"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_10.png" alt="loss weights" width="800">
+</p>
+<a id="table_11"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_11.png" alt="loss weights" width="800">
+</p>
 
 ### **Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link)**
-In [table 12](#) and [table 13](#) are reported the metrics for the joint training and the unimodal tranings both for class and category respectively for validation and test set. We can notice very quickly that the multimodal training brings better perfomances in both task, suggesting that both tasks can benefit from each other.
+In [table 12](#table_12) and [table 13](#table_13) are reported the metrics for the joint training and the unimodal tranings both for class and category respectively for validation and test set. We can notice very quickly that the multimodal training brings better perfomances in both task, suggesting that both tasks can benefit from each other.
+<a id="table_12"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_12.png" alt="loss weights" width="800">
+</p>
+<a id="table_13"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_13.png" alt="loss weights" width="800">
+</p>
 
-By looking to [table 14](#) it seems that the Single-head model is better in finding AI Images, but losses perfomances as seen before in the transfer category. While Multi-head is more accurate on real Images.
+By looking to [table 14](#table_14) it seems that the Single-head model is better in finding AI Images, but losses perfomances as seen before in the transfer category. While Multi-head is more accurate on real Images.
+<a id="table_14"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_14.png" alt="loss weights" width="800">
+</p>
 
 ### **Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with different loss weight combinations**
-In [table 15](#) and [table 16](#) are reported the metrics for different weights combination on validation and test sets respectively. There is a very little differences, but we can assert that if the principal task is to detect Ai/Real, use $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 1 $. If it is necessary something balanced then use $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 2.7665 $. If the principal task is category detection, then use $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 5 $.  
+In [table 15](#table_15) and [table 16](#table_16) are reported the metrics for different weights combination on validation and test sets respectively. There is a very little differences, but we can assert that if the principal task is to detect Ai/Real, use $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 1 $. If it is necessary something balanced then use $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 2.7665 $. If the principal task is category detection, then use $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 5 $. 
+
+<a id="table_15"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_15.png" alt="loss weights" width="800">
+</p>
+<a id="table_16"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_16.png" alt="loss weights" width="800">
+</p>
+
 But what is important to note is in the training process:
 By looking at the [graphs](#) of the training, regardless of the weight assigned to the Category term, it follows the velocity learning of the Class term. In fact, when the weight contribution regarding the class is very low, the category loss reached the amount of 0.20 only in the 6-th epoch (altough it had a very big weight), while in the other weightening configuration reached that value on the 3-th and 5-th epoch (even the weight was really low). This confirms that the category task is "leeching" from the class task.
 
-In [table 16](#), we can notice that there is a general trend between the different configuration of weightings that in redigital and transfer category it is more powerful in detecting AI images but less powerful in detecting Real Images. 
+In [table 17](#table_17), we can notice that there is a general trend between the different configuration of weightings that in redigital and transfer category it is more powerful in detecting AI images but less powerful in detecting Real Images. 
+<a id="table_17"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_17.png" alt="loss weights" width="800">
+</p>
 
 ## Conclusion
 In this project we have seen that:

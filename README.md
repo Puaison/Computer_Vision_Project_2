@@ -55,7 +55,7 @@ The first thing that we need to analyze is the base model detector that the pape
   </sub>
 </p>
 
-Then the author of [DRCT](#chen2024drct) transformed the [ConvNext_Base](#convnext) head in a features extractor and glued a new head that has 2 as output-dimension (the beige block in the image below). Finally they trained it to became a detector of AI Images.
+Then the author of [DRCT](#chen2024drct) transformed the [ConvNext_Base](#convnext) head in a features extractor and glued a new head that has 2 as output-dimension (the pink block in the image below). Finally they trained it to became a detector of AI Images.
 
 <a id="DRCT_architecture"></a>
 <p align="center">
@@ -87,7 +87,8 @@ The loss used for both the two task is the CrossEntropy, i.e.:
 $$
 CE(y, \hat{y}) = - \log(\hat{y}_{y})
 $$
-where $ \hat{y}_{y} $ is the probability predicted of the correct class assigned to y by the model 
+
+where $\hat{y}_{y}$ is the probability predicted of the correct class assigned to y by the model.
 Despite when trained singularly there is no necessity to normalize to the same scale the loss, while comparing a binary with a ternary loss is necessary a normalization.
 In fact, when the model assigns uniformely the sample to all the K classes of the problem, it will produce. 
 

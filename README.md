@@ -4,7 +4,7 @@ AI-Generated Image detectors are usually trained and evaluated in idealized cond
 
 In this project, we are going further and extended that setting in two main directions:
 - We do not only classify Real/AI Images, but we also identify to which **post-processing  category transformaton** images belong; This is done in a **joint multi-task learning fashion** and this allows us to understand if one task can benefit from the features and model-weights learned from the other task or if they compete, resulting in the degradation of both tasks' performances during joint-training. 
-- We adapted the [DRCTConvNext_Base detector](#chen2024drct) (which is the best according to the [[1]](#li2025) work) by adding a parallel Stem branch which processes the amplitude of the **Discrete Fourier Transform (DFT)**, The motivation relies on the hypothesis that some post-processing transformations can leave detectable traces in the frequency spectrum (and acting like a low-pass or high-pass filter).
+- We adapted the [DRCTConvNext_Base detector](#chen2024drct) by adding a parallel Stem branch which processes the amplitude of the **Discrete Fourier Transform (DFT)**, The motivation relies on the hypothesis that some post-processing transformations can leave detectable traces in the frequency spectrum (and acting like a low-pass or high-pass filter).
 
 The proposed model, called DRCTConvB-DFT, combines both RGB information and DFT informations as a shared backbone. It uses two heads to generate the output: one that takes into account Real/AI detection and the other for category post-processing classification.
 
@@ -45,10 +45,11 @@ Another important features is the possibility to choose between **Lazy Loading**
 
 The subset archive can be downloaded [here](https://drive.google.com/file/d/1Y9WJSk2nGYXYGO9T6PcgerI0cK-aGbHn/view?usp=sharing), while the folder of the original RRDataset can be seen [here](https://drive.google.com/drive/folders/1fTFIHXxDNseudhx9EJI-QoA0ZtzvGv8O?usp=sharing)
 
-## Network
-As mentioned in the abstract, in this project We propose a new model based on the [DRCTConvNext_Base](#chen2024drct) detector that takes in input not only RGB features, but also the DFT Amplitude features. The name is DRCTConvNext_Base_DFT (abbreviated DRCTConvB_DFT). We compared both models on the two tasks separately and jointly. We found out that this modification improved slightly the classification Real/Ai task, but when combined with the transformation classification, it outperformed the DRCTConvNext_Base. This confirms the hypothesis that the study of the spectrum really helped the network in understanding the transformation category. We will show the results in the **Results** chapter; In this chapter we are going to describe in details the Architecture and the modifications.
+## Network architecture
 
-The first thing that we need to analyze is the base model detector that the paper [DRCT](#chen2024drct) modified, that is [ConvNext_Base](#convnext). It is a variant of the ConvNeXt family, CNN-ResNet based models that try to achieve the same results of Vision Transformers by adapting some ideas that became popular and common in the ViT. The result is a CNN Model that can compete with Transformers in vision tasks.
+As mentioned in the abstract, in this project we propose a new multi-head model based on the [DRCTConvB](#chen2024drct) detector that takes in input not only RGB features, but also the DFT Amplitude features. The name is **DRCTConvB-DFT**. 
+
+[DRCTConvB](#chen2024drct) (the baseline of this project) is a modification of the [ConvNeXt_Base](#convnext), a Network from the ConvNeXt family. ConvNeXt architectures modernize ResNet-style CNNs by adapting and incorporating some ideas and design choiches that became popular and common in the Vision Transformers, resulting in CNN Models that can compete with Transformers in vision tasks.
 <a id="ConvNeXt_architecture"></a>
 <p align="center">
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Base_Model_centered.jpg" alt="BaseConvNeXt" width="200">
@@ -58,7 +59,7 @@ The first thing that we need to analyze is the base model detector that the pape
   </sub>
 </p>
 
-Then the author of [DRCT](#chen2024drct) transformed the [ConvNext_Base](#convnext) head in a features extractor and glued a new head that has 2 as output-dimension (the pink block in the image below). Finally they trained it to became a detector of AI Images.
+The author of [DRCT](#chen2024drct) transformed the [ConvNeXt_Base](#convnext) original head in a features extractor and glued a the end of the network a new binary head (the pink block in the image below) that outputs two logits: one for real images and one for AI-generated images.
 
 <a id="DRCT_architecture"></a>
 <p align="center">
@@ -69,12 +70,24 @@ Then the author of [DRCT](#chen2024drct) transformed the [ConvNext_Base](#convne
   </sub>
 </p>
 
-In the work of [RRDataset](#li2025), the authors found out that this is the best model to be fine-tuned and used in real world detection of AI Images that can be degraded.
+In [RRDataset](#li2025) benchamrk, DRCTConvB was reported as the strongest detector among the considered models when fine-tuned and used in real world detection of AI degraded Images.
 
 
-And now we come to **DRCTConvB_DFT**: as in this project we want to predict also the post-processing transformation, I added also a Stem that is the copy in size and layers of the Stem in the referred model. But in input we cannot pass only a DFT, as Convolutional Layer are not capable of distinguish in which portion of the image the patch was taken, and then could be impossible to distinguish between low frequencies and high frequencies. For this motivation, we concatenate in the channels a **Normalized Radial Map**, a special images that in each pixel there is the distance from the center, and then the Stem branch can associate the DFT Amplitude portion to a particular frequency. At the end, the feature maps of the DFT branch are summed pixel-wise with the feature maps of the RGB original Stem branch and then they continue together the flow in the network. The new added head takes in input the same embeddings of the Real/Ai Head, but it return 3 logits.
+Our proposed model extends DRCTConvB by adding a parallel frequency-domain branch.
+The main idea is to give to the network access not only to the RGB Image processed by the original ConvNeXt Stem, but also to the DFT amplitude of the Image as it may contain informations about the undergone post-processing transformation.
 
-Below there is the complete structure of the proposed model with the two different heads. The block marked with green are the blocks that I added.
+The DFT Stem has the same structure as the original RGB Stem. But a convolutional layer, by itself, cannot distinguish if a local patch comes from the region of high frequencies or low frequencies. To solve this problem, we concatenate a **Normalized Radial Map** to the DFT amplitude along channel dimension. Each pixel of the Radial Map contains the normalized distance from the center. In this way, the network can associate the DFT Amplitude portions to their corresponding frequency ranges. A the end, the feature maps of the DFT branch are summed pixel-wise with the feature maps of the RGB original Stem branch.
+
+To summaryze the structure and the flow of the new proposed model:
+1. The RGB image is analyzed by the original RGB Stem.
+2. The DFT amplitude and normalized radial map are analyzed by the DFT Stem.
+3. The feature maps outputted by the two Stems are summed elemet-wise.
+4. The combined feature maps are passed through the shared DRCTConvB backbone.
+5. The final embedding is sent to two different heads:
+   - a **real/AI class head** which returns 2 logits;
+   - a **category transformation head** which returns 3 logits. 
+
+Below there is the image of the structure of our new proposed model with the two different heads and the parallel DFT Stem. The block marked in green are the blocks that we added.
 <a id="prposed_architecture"></a>
 <p align="center">
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/DFT_model_centered.jpg" alt="Model architecture" width="600">

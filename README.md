@@ -40,7 +40,7 @@ This ensures split balance both in real/fake classes and transformation categori
 The subset creation is implemented in this [notebook](https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Subset_creator.ipynb)
 
 Another important features is the possibility to choose between **Lazy Loading** and **Eager Loading**:
-- With **Lazy Loading** the DataLoader will re-load the image and re-compute the DFT Amplitude every time the image is requested. With A100 GPU, every epoch it loses about 40/50 seconds in this process.
+- With **Lazy Loading** the DataLoader will re-load the image and re-compute the DFT Amplitude every time the image is requested. With A100 GPU, in every epoch it loses about 40/50 seconds in this process.
 - With **Eager Loading** the DataLoader will load and compute the DFT Amplitude of the image at the beginning of the Colab Session and then it will store them in the GPU memory. With A100 GPU the Eager loading takes about 4 minutes, but then we recover 40/50 seconds in each epoch of training. The drowaback is that it requires around 17-18 GB of GPU memory. 
 
 The subset archive can be downloaded [here](https://drive.google.com/file/d/1Y9WJSk2nGYXYGO9T6PcgerI0cK-aGbHn/view?usp=sharing), while the folder of the original RRDataset can be seen [here](https://drive.google.com/drive/folders/1fTFIHXxDNseudhx9EJI-QoA0ZtzvGv8O?usp=sharing)

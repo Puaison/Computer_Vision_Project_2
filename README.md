@@ -1,25 +1,28 @@
 # Project 2: Joint Detection of AI-Generated Images and Post-Processing Alterations in Real-World Scenarios
 ## Abstract:
-AI-Generated Image detectors are usually trained and evaluated in idealized conditions. But in real world scenario, images undergo post-processing transformations, which can introduce a degradation signature and artifacts in the image-pattern and lead the detectors in error. In this context it is inserted the work of [Li et al. (2025)](#li2025): The authors introduced a new Benchmark Dataset (called **RRDataset**) containing images under three different format categories: original images, images modified by the transmition through the internet, and image the modified by a redigitalization process. In their work, several state-of-the-art AI-detectors were fine-tuned on their Dataset contaning these eterogeneous images, and then they analyzed how the real/fake detection changed across the transformations (w.r.t. the origianl scenario).
+AI-Generated Image detectors are usually trained and evaluated in idealized conditions. But in real world scenario, images undergo post-processing transformations, which can introduce a degradation signature and artifacts in the image-pattern and lead the detectors in error. In this context it is inserted the work of [Li et al. (2025)](#li2025). The authors introduced a new Benchmark Dataset (called **RRDataset**) containing images under three different format categories: original images, images modified by the transmition through the internet, and images modified by a redigitalization process. In their work, several state-of-the-art AI-detectors were fine-tuned on their Dataset contaning these eterogeneous images, and then they analyzed how the real/fake detection changed across the transformations (w.r.t. the origianl scenario).
 
-In this project, we are going further and extended that setting in two directions:
-- We do not only classify Real/AI Images across different transformations, but we also identify **post-processing  category transformaton** to which the images belong; we analyzed if one task can benefit from the features and model-weights learned from the opposite task or if they compete, resulting in the degradation of both tasks' performance during joint-training. 
-- We adapted the state-of-the-art [DRCTConvNext_Base](#chen2024drct) (which is the best in the [[1]](#li2025) work) in order to take in input not only the RGB-values but also the amplitude of the Discrete Fourier Transform, following the hypothesis that some post-processing transformations can leave a mark in the spectrum (like low-pass or high-pass filters).
+In this project, we are going further and extended that setting in two main directions:
+- We do not only classify Real/AI Images, but we also identify to which **post-processing  category transformaton** images belong; This is done in a **joint multi-task learning fashion** and this allows us to understand if one task can benefit from the features and model-weights learned from the other task or if they compete, resulting in the degradation of both tasks' performances during joint-training. 
+- We adapted the [DRCTConvNext_Base detector](#chen2024drct) (which is the best according to the [[1]](#li2025) work) by adding a parallel Stem branch which processes the amplitude of the **Discrete Fourier Transform (DFT)**, The motivation relies on the hypothesis that some post-processing transformations can leave detectable traces in the frequency spectrum (and acting like a low-pass or high-pass filter).
+
+The proposed model, called DRCTConvB-DFT, combines both RGB information and DFT informations as a shared backbone. It uses two heads to generate the output: one that takes into account Real/AI detection and the other for category post-processing classification.
 
 
 ## Dataset
-We trained the models in the Google Colab Environment (in particular on T4 and A100 GPUs) as we did not have access to powerful local machines. The drowback is that in every session we need to re-load the Dataset in the /content/, and this is impractical if we are using the complete RRDataset which size is around 20 GB. Also loading the Dataset in Google Drive is impractical as, during training, most of the time would be lost in I/O passages between Colab and Drive.
-Thus, the more convinient solution was:
-1) The Creation of a subset of 9000 Images (3.4 GB)
-2) The Compression of this subset (this does not reduce the size, but the next steps will be faster).
-3) The Saving of this archive in the Local Drive
-4) The Download of this archive in the /content/ of Google Colab
-5) The Extraction of this archive
-6) The Creation of train,validation and test sets
+All experiments were perfomred on a subset (both balanced in Real/Ai classes and in category transformations) of RRDataset. We trained the models in the Google Colab Environment (in particular on T4 and A100 GPUs) as we did not have access to powerful local machines. The drowback is that at the beginning of every Colab session we need to re-load the Dataset in /content/, and this is impractical if we are using the complete RRDataset which size is around 20 GB. Also using the Dataset from Google Drive is impractical as, during training, most of the time would be lost in I/O passages between Colab and Drive.
 
-While passage 1-2-3 can be done only once, we need to repeat passage 4-5-6 in every colab session. But downloading and extracting the archive is critically faster than downloading and using the subset folder as is. 
+For this reason we used the following procedure:
+1) The Creation of a subset of **9,000 Images** (**3.4 GB**)
+2) The Compression of this subset (this does not reduce the size, but it makes copying faster).
+3) The Storing of this archive in the Google Drive
+4) The Download of this archive in /content/ of Google Colab
+5) The Locally Extraction of this archive in /content/
+6) The Creation of the train,validation and test splits
 
-It is important to spend some words about step 1), in particular on the criteria of the balanced data split; I divided the Images in six big families, and took 1500 images for each macro-category:
+While passage 1-2-3 can be done only once, we need to repeat passage 4-5-6 at the beginning of every Colab session. This is faster than repeatedly downloading and using the subset raw folder as is. 
+
+It is important to spend some words about step 1), in particular on the criteria of the balanced data split; I divided the Images in six big families, and took **1,500 images** for each group:
 - original/ai
 - original/real
 - redigital/ai
@@ -27,18 +30,18 @@ It is important to spend some words about step 1), in particular on the criteria
 - transfer/ai
 - transfer/real
 
-Then, during training, each macro-category of 1500 photos is divided in three sets:
--  train set 70% (in total 6300=6*1050)
--  validation set 15% (in total 1350=6*225)
--  test set 15% (in total 1350=6*225)
+Then, during training, each macro-category of 1,500 photos is divided in three splits:
+-  train set 70% (in total 6,300=6*1,050)
+-  validation set 15% (in total 1,350=6*225)
+-  test set 15% (in total 1,350=6*225)
 
 This ensures split balance both in real/fake classes and transformation categories.
 
-Steps 1-2-3 are done separately in this [notebook](https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Subset_creator.ipynb)
+The subset creation is implemented in this [notebook](https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Subset_creator.ipynb)
 
 Another important features is the possibility to choose between **Lazy Loading** and **Eager Loading**:
 - With **Lazy Loading** the DataLoader will re-load the image and re-compute the DFT Amplitude every time the image is requested. With A100 GPU, every epoch it loses about 40/50 seconds in this process.
-- With **Eager Loading** the DataLoader will load and compute the DFT Amplitude of the image at the beginning and then it will store them in the GPU memory. With A100 GPU the Eager loading lasts 4 minutes, but then we recover 40/50 seconds in each epoch of training. The drowaback is that we need around 17/18 GB of VRAM of the GPU. 
+- With **Eager Loading** the DataLoader will load and compute the DFT Amplitude of the image at the beginning of the Colab Session and then it will store them in the GPU memory. With A100 GPU the Eager loading takes about 4 minutes, but then we recover 40/50 seconds in each epoch of training. The drowaback is that it requires around 17-18 GB of GPU memory. 
 
 The subset archive can be downloaded [here](https://drive.google.com/file/d/1Y9WJSk2nGYXYGO9T6PcgerI0cK-aGbHn/view?usp=sharing), while the folder of the original RRDataset can be seen [here](https://drive.google.com/drive/folders/1fTFIHXxDNseudhx9EJI-QoA0ZtzvGv8O?usp=sharing)
 

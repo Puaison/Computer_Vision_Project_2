@@ -205,25 +205,14 @@ By looking at the [graphs](#) of the training, regardless of the weight assigned
 
 In [table 16](#), we can notice that there is a general trend between the different configuration of weightings that in redigital and transfer category it is more powerful in detecting AI images but less powerful in detecting Real Images. 
 
+## Conclusion
+In this project we have seen that:
+- Our proposed model that is DRCTConvB with a parallel DFT Stem is generally better than the base DRCTConvB in the classification of AI/Real Images.
+- Jointly combining the two tasks can achieve even better results in detection and post-processing classification, but the most important thing is that category transformation classification benefits from the other task (it is like a leech)
+In fact our proposed model overperformed the overall accuracy reported in the work of [RRDatatset](#li2025) even using 1/6 of the original dataset.
 
-
-
-
-
-
-
-
-
-
-
-
-
-## Other stuffs
-We introduce a second head which has the role of detecting which type of transformation the image was subjected, and then 
-I modified the the best network found in the Benchamrk of [[1]](#li2025) (that is [DRCTConvB](#chen2024drct)) in order to add a Parallel Stem on DFT, and then sum the feature maps of this Stem with the feature maps of the RGB Stem. The hypothesis is that, for understanding what type of transformation the image is undergone, some of these information can be in the DFT magnitude. And in order to indicate to the Network if the magnitude in the recptive field is a high-frequency or low-fre, we overlapped with a Radial Map.
-We are going to see in details:
-Creation of the subset
-Replication of the experiment in this subset and then seeing what are the results of the DFT
+## Future works
+It would interesting to replicate the fifth experiment with the whole [RRDatatset](#li2025) and using the same training configuration used by the authors of the Dataset to see what performances the proposed model can reach.
 
 
 # References

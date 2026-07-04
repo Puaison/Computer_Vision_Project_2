@@ -128,15 +128,16 @@ However I did significant changes in order to adapt those skeletons to this work
 </br>
 </br>
 </br>
-In this section we are going to describe the setup for the experiments done.
-Classification Real/AI task (from now we will refer to as **class task**):
-- Starting from the [DRCTConvB Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) we fine tuned the DRCTConvB model on the Subset created from the RRDataset and used only the class AI/Real loss. We will call this checkpoint from now on as [RGB ONLY SINGLE HEAD CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing)
-- Starting from the [DRCTConvB Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) we initialized the DFT Stem at zero weights and then fine tuned the new proposed model (DRCTConvB_DFT) on the Subset created from the RRDataset and used only the class AI/Real loss. We will call from now on this checkpoint as [DFT SINGLE HEAD CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link)
-- Compared the results of the steps before with the [DRCTConvB Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with no fine-tuning.
+In this section we are going to describe the setup for the experiments done. We used our proposed model and the DRCTConvB detector.
 
-Brief result: The [DRCTConvB Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) without fine-tuning is really bad in the detection of AI images. Instead, our proposed model reached satisfying values and slightly outperformed the [DRCTConvB Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with fine tuning
+**Single Head Classification Real/AI task** (from now we will refer to as **class task**):
+- Starting from the [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) we fine tuned the DRCTConvB model on the Subset created from the RRDataset and used only the class AI/Real loss. We will call this checkpoint from now on as [RGB ONLY CLASS TASK CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing)
+- Starting from the [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) we initialized the DFT Stem at zero weights and then fine tuned the new proposed model (DRCTConvB_DFT) on the Subset created from the RRDataset and used only the class AI/Real loss. We will call from now on this checkpoint as [DFT CLASS TASK CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link)
+- Compared the results of the steps before with the [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with no fine-tuning.
 
-Multihead fine-tuning of both models starting from the [RGB ONLY SINGLE HEAD CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing) and [DFT SINGLE HEAD CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link):
+Brief result: The [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) without fine-tuning is really bad in the detection of AI images. Instead, our proposed model reached satisfying values and slightly outperformed the [DRCTConvB Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with fine tuning
+
+**Multihead fine-tuning of both models starting from our checkpoints of the previous Single Head class tarining task ([RGB ONLY CLASS TASK CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing) and [DFT CLASS TASK CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link)**):
 We glued the second head and divided the process of fine tuning in two steps:
 1) freezed all the model (for 4 epochs) apart from the new head and used only the category loss in order to train the new head to adapt to the features learned for the classification REal/AI task
 2) Unlocked all the parts of the model and trained combined the two heads with $ w_{\mathrm{AI/R}} = 0.1 $ (as being already trained to detect fake images) and $ w_{cat} = 1 $. Moreover we set different learning rates fot the parts of the model. For example for the **class task** head we give a very low learning rate as we don't want to disrupt the learned features.
@@ -144,20 +145,28 @@ We glued the second head and divided the process of fine tuning in two steps:
 
 Brief result: Confirmed that our proposed model has sliglty better perfomances in AI/Real detection, while outperformed in category transformation detection. 
 
-From these two first experiments we noted that our proposed model is better than the base DRCT detector, so from now on all the experiment will be done with our proposed model.
+From these first two experiments we noted that our proposed model is better than the base DRCT detector, so from now on all the experiment will be done with our proposed model.
 
-Category transformation detection task (from now we will refer to as **category task**):
-- Starting from the [DRCTConvB Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) we fine tuned the proposed model on the Subset created from the RRDataset and used only the category detection loss.
-- Starting from my personal [DFT SINGLE HEAD CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link), we fine tuned the proposed model on the Subset created from the RRDataset and used only the category detection loss.
+**SingleHead Category transformation detection task** (from now we will refer to as **category task**):
+- Starting from the [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) we fine tuned the proposed model on the Subset created from the RRDataset and used only the category detection loss.
+- Starting from our personal [DFT CLASS TASK CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link), we fine tuned the proposed model on the Subset created from the RRDataset and used only the category detection loss.
 - Compared the results
 
 Brief result: If the model has already learned features for the **class task**, then **category task** benefits from them and reach better result while disrupting the class accuracy. 
 
-Multihead fine-tuning of the proposed model starting from [DRCTConvB Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) on the Subset created from the RRDataset and used the combined weighted loss $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 1 $ with the same configuration and learning rates of the single head tasks. Then compared this joint learning with the unimodal learnings
+**Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link)** on the Subset created from the RRDataset and used the combined weighted loss $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 1 $ with the same configuration and learning rates of the single head tasks. Then compared this joint learning with the unimodal learnings
 
 Brief results: the joint training improve both the task with respect to two unimodal tasks that starts from the same inital point [DRCTConvB Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link)
 
-The last experiment was a set of training with different loss weight combinations and analyzed how the performances changed.
+**Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with different loss weight combinations** and analyzed how the performances changed.
+
+In the table below there are the weights used and the nominal relative contribution to the total combined loss.
+
+<a id="loss_weights"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/loss_weights.png" alt="loss weights" width="600">
+</p>
+
 Brief result: We confirmed that the category task benefits and highly depends from the class task and it follows the class task's training velocity despite the weight assigned to it is bigger. And bigger the weight, more at the end bring better result in that category instead of the other task.
 
 

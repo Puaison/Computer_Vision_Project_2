@@ -98,7 +98,7 @@ Below there is the image of the structure of our new proposed model with the two
 </p>
 
 ## Loss function
-The loss used for both the two task is the CrossEntropy, i.e.:
+Both tasks are trained with cross-entropy loss. For one sample with the true class prediction as $y$, the cross-entropy-loss is:
 
 $$
 CE(y, \hat{y}) = - \log(\hat{y}_{y})

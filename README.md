@@ -180,6 +180,21 @@ We consider two supervised tasks:
 | E4 | Joint training from a common initialization | DRCTConvB-DFT | DRCT Base Checkpoint | Class and Category accuracy-F1 | Compare joint training against the corresponding single-task trainings from the same starting point. |
 | E5 | Loss-weight ablation | DRCTConvB-DFT | DRCT Base Checkpoint | Class and Category accuracy-F1 | Using a Joint loss with different $w_{\mathrm{cat}}$ , keeping $w_{\mathrm{AI/R}} = 1$ , we study the trade-off between real/AI detection and category transformation classification. |
 
+### Loss-weight ablation
+Before running the final loss-weight ablation, we have done some experiments with differnt learning rates while keeping fixed $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 1 $ to identify which is the best learning rate for the MultiHead configuration. We have found that the best is **3e-4**, which is then used for the loss-weight ablation.
+
+The table below there reports the weights tested and their nominal relative contribution to the total combined loss (maintaining $ w_{\mathrm{AI/R}} = 1 $ fixed)
+
+<a id="loss_weights"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/loss_weights.png" alt="loss weights" width="600">
+</p>
+
+## Results and discussion
+This section follows the same order presented in the experimental roadmap. The goal is to give an answer to the raised questions that motivated the experiments.
+
+### E1 -- Single Head Real/Ai Images Classification task
+
 
 **Single Head Classification Real/AI task** (from now we will refer to as **class task**):
 - Starting from the [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) we fine tuned the DRCTConvB model on the Subset created from the RRDataset and used only the class AI/Real loss. We will call this checkpoint from now on as [RGB ONLY CLASS TASK CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing)
@@ -210,14 +225,6 @@ Brief result: If the model has already learned features for the **class task**, 
 Brief results: the joint training improve both the task with respect to two unimodal tasks that starts from the same inital point [DRCTConvB Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link)
 
 **Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with different loss weight combinations** and analyzed how the performances changed.
-But before we have conducted experiments with differnt learning rates and $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 1 $ fixed to identify which is the best learning rate for the MultiHead model and found out to be **3e-4**. Then from now on we will use this learning rate.
-
-In the table below there are the weights used and the nominal relative contribution to the total combined loss (maintaining $ w_{\mathrm{AI/R}} = 1 $ fixed)
-
-<a id="loss_weights"></a>
-<p align="center">
-  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/loss_weights.png" alt="loss weights" width="600">
-</p>
 
 Brief result: We confirmed that the category task benefits and highly depends from the class task and it follows the class task's training velocity despite the weight assigned to it is bigger. And bigger the weight, more at the end bring better result in that category instead of the other task.
 

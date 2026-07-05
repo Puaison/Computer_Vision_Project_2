@@ -316,9 +316,6 @@ By looking at [Table 14](#table_14) the Single-head model appears to be stronger
 
 In the final experiment we studied how the realtive weight of the two lossess for the two tasks affects the trade-off between Real/AI detection and category classification. We kept $w_{\mathrm{AI/R}} = 1$ fixed and varied $w_{\mathrm{cat}}$.
 
-Brief result: We confirmed that the category task benefits and highly depends from the class task and it follows the class task's training velocity despite the weight assigned to it is bigger. And bigger the weight, more at the end bring better result in that category instead of the other task.
-
-**Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with different loss weight combinations**
 In [table 15](#table_15) and [table 16](#table_16) are reported the metrics for different weights combination on validation and test sets respectively. Instead, in [table 17](#table_17) are reported the means of the same metrics between test and validation sets. The differences between configurations are not extremely large, but we can extract these practical guidelines: 
 - If the principal task is to **detect Ai/Real**, use $w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 1$;
 -  If it is necessary a **balance trade-off**, use $w_{\mathrm{AI/R}} = 1$ and $ w_{cat} = 2.7665 $;

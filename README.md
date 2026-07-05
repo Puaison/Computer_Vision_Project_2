@@ -175,10 +175,15 @@ We consider two supervised tasks:
 | ID | Experiment | Model(s) | Initialization | Metrics considered | Purpose |
 |---|---|---|---|---|---|
 | E1 | Single-head class task | DRCTConvB, DRCTConvB-DFT | DRCT Base Checkpoint | Class accuracy only | Test if DFT helps the real/AI task and if fine-tuning is necessary.|
-| E2 | Multi-head fine-tuning from class checkpoints | DRCTConvB, DRCTConvB-DFT | RGB-Only Class Task Checkpoint, DFT Class Task Checkpoint | Category accuracy-F1 only |  Through a Category-head warm-up and then a joint loss, test if DFT features help category detection when the model was previously trained on class task. |
+| E2 | Multi-head category fine-tuning from class-task checkpoints | DRCTConvB, DRCTConvB-DFT | RGB-Only Class Task Checkpoint, DFT Class Task Checkpoint | Category accuracy-F1 only |  Through a Category-head warm-up and then a joint loss, test if DFT features help category detection when the model was previously trained on class task. |
 | E3 | Single-head category task | DRCTConvB-DFT | DRCT Base Checkpoint or DFT Class Task Checkpoint | Category accuracy-F1 only | Test if category task benefits from class task pretraining, and if catastrophic unlearning occurs. |
 | E4 | Joint training from a common initialization | DRCTConvB-DFT | DRCT Base Checkpoint | Class and Category accuracy-F1 | Compare joint training against the corresponding single-task trainings from the same starting point. |
 | E5 | Loss-weight ablation | DRCTConvB-DFT | DRCT Base Checkpoint | Class and Category accuracy-F1 | Using a Joint loss with different $w_{\mathrm{cat}}$ , keeping $w_{\mathrm{AI/R}} = 1$ , we study the trade-off between real/AI detection and category transformation classification. |
+
+### Multi-head category fine-tuning strategy from class-task checkpoints
+When the category head is added to a checkpoint already trained on the Real/Ai detection task, we used a two-phases fine-tuning workflow:
+1) **Category head warm-up**: freeze the backbone and the real/AI head and train only the new head (for 4 epochs) in order to adapt to the freatures already learned for the class task;
+2) **Joint fine-tuning**: unfreeze the whole model and optimize both heads together with the combined loss weights of $w_{\mathrm{AI/R}} = 0.1$ (as being already trained to detect fake images) and $w_{cat} = 1$. In addition, set different learning rates to different parts of the model to not disrupt the representations learned for class tasks while adapting to the category task.
 
 ### Loss-weight ablation
 Before running the final loss-weight ablation, we have done some experiments with differnt learning rates while keeping fixed $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 1 $ to identify which is the best learning rate for the MultiHead configuration. We have found that the best is **3e-4**, which is then used for the loss-weight ablation.
@@ -237,11 +242,8 @@ To verify if our proposed model (DRCTConvB-DFT) is really using the DFT Stem bra
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_7.png" alt="loss weights" width="800">
 </p>
 
-**Multihead fine-tuning of both models starting from our checkpoints of the previous unimodal class training task ([RGB ONLY CLASS TASK CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing) and [DFT CLASS TASK CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link)**):
-We glued the second head and divided the process of fine tuning in two steps:
-1) freezed all the model (for 4 epochs) apart from the new head and used only the category loss in order to train the new head to adapt to the features learned for the classification REal/AI task
-2) Unlocked all the parts of the model and trained combined the two heads with $ w_{\mathrm{AI/R}} = 0.1 $ (as being already trained to detect fake images) and $ w_{cat} = 1 $. Moreover we set different learning rates fot the parts of the model. For example for the **class task** head we give a very low learning rate as we don't want to disrupt the learned features.
-3) Then compared both DRCT_ConvB e DRCTConvB_DFT with the same experiment parameters and configuration
+### E2 -- Multi-head category fine-tuning from class-task checkpoints
+
 
 Brief result: Confirmed that our proposed model has sliglty better perfomances in AI/Real detection, while outperformed in category transformation detection. 
 

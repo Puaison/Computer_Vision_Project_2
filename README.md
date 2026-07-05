@@ -194,14 +194,48 @@ The table below there reports the weights tested and their nominal relative cont
 This section follows the same order presented in the experimental roadmap. The goal is to give an answer to the raised questions that motivated the experiments.
 
 ### E1 -- Single Head Real/Ai Images Classification task
+The first experiments evaluates how models detect real/AI images under different post-processing transformations. We compare:
+- DRCTConvB with the original DRCT Base Checkpoint without additional fine-tuning;
+- DRCTConvB fine-tuned on our Dataset;
+- DRCTConvB-DFT (the proposed model) fine-tuned on our Dataset.
+
+The validation and test metrics are reported in [table 2](#table_2). At first glance we can notice that DRCTConvB performs poorly without fine-tuning. This suggets that fine-tuning is necessary for this task.
+<a id="table_2"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_2.png" alt="loss weights" width="800">
+</p>
+
+In fact, by looking at [table 3](#table_3) the DRCT Base Checkpoint predicts most of the images as "Real", regardless of the post-processing transformation.
+<a id="table_3"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_3.png" alt="loss weights" width="800">
+</p>
+
+After fine-tuning, both DRCTConvB and DRCTConvB-DFT reach much stronger performances. Moreover we can assert that out proposed model slightly improves Real/AI detection accuracy despite it is less confident due to higher loss.  
 
 
-**Single Head Classification Real/AI task** (from now we will refer to as **class task**):
-- Starting from the [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) we fine tuned the DRCTConvB model on the Subset created from the RRDataset and used only the class AI/Real loss. We will call this checkpoint from now on as [RGB ONLY CLASS TASK CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing)
-- Starting from the [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) we initialized the DFT Stem at zero weights and then fine tuned the new proposed model (DRCTConvB_DFT) on the Subset created from the RRDataset and used only the class AI/Real loss. We will call from now on this checkpoint as [DFT CLASS TASK CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link)
-- Compared the results of the steps before with the [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with no fine-tuning.
+By breaking down real/fake detection accuracy separately for each transformation category, the results for RGB-only checkpoint in [table 4](#table_4) and DFT checkpoint in [table 5](#table_5) suggest that both models behave differently w.r.t. post-processing condition, and in particular, they perform better in redigital category (w.r.t the original category) while perform less on the transfer category (in particular our proposed model)
 
-Brief result: The [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) without fine-tuning is really bad in the detection of AI images. Instead, our proposed model reached satisfying values and slightly outperformed the [DRCTConvB Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with fine tuning
+<a id="table_4"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_4.png" alt="loss weights" width="800">
+</p>
+
+<a id="table_5"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_5.png" alt="loss weights" width="800">
+</p>
+
+To verify if our proposed model (DRCTConvB-DFT) is really using the DFT Stem branch, we performed an ablation at test time: after training, we set the parameters of the parallel DFT branch to zero and we compared how the predictions in the test set changed. Results are reported in [table 6](#table_6) and [table 7](#table_7). It is possible to note that there is a slight improvement in the fake detection across all categories, but it strongly reduce accuracy score in the detection of real images across categories. This suggests that our proposed model is effectively using and learning the DFT Stem.
+<a id="table_6"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_6.png" alt="loss weights" width="800">
+</p>
+
+<a id="table_7"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_7.png" alt="loss weights" width="800">
+</p>
 
 **Multihead fine-tuning of both models starting from our checkpoints of the previous unimodal class training task ([RGB ONLY CLASS TASK CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing) and [DFT CLASS TASK CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link)**):
 We glued the second head and divided the process of fine tuning in two steps:
@@ -210,6 +244,21 @@ We glued the second head and divided the process of fine tuning in two steps:
 3) Then compared both DRCT_ConvB e DRCTConvB_DFT with the same experiment parameters and configuration
 
 Brief result: Confirmed that our proposed model has sliglty better perfomances in AI/Real detection, while outperformed in category transformation detection. 
+
+### **Multihead fine-tuning of both models starting from our checkpoints of the previous unimodal class training task ([RGB ONLY CLASS TASK CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing) and [DFT CLASS TASK CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link)**)
+
+By looking at the [table 8](#table_8) we can assert that our proposed model is more performing in respect to the DRCTConvB base model (despite it has more uncertainty). In particular it is important to note that thanks to the new DFT Stem branch, our model is hugely particularly more accurated and balanced in category recognition (+18,37 in accuracy and +27,56 in F1-macro) and this confirm our initial hypothesis that it is more simple to detect post-processing transformation by looking also to the spectrum.
+
+<a id="table_8"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_8.png" alt="loss weights" width="800">
+</p>
+
+In [table 9](#table_9) are also reported the metrics for Test set, that confirms what we have seen in the validation set.
+<a id="table_9"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_9.png" alt="loss weights" width="800">
+</p>
 
 From these first two experiments we noted that our proposed model is better than the base DRCT detector, so from now on all the experiment will be done with our proposed model.
 
@@ -234,55 +283,6 @@ Brief result: We confirmed that the category task benefits and highly depends fr
 ## Results
 In this section we are going to show the metrics and performances of the five experiments conducted. Our proposed model will be higlited in blue.
 
-### **Single Head Classification Real/AI task**
-The results on test and validation sets are reported in [table 2](#table_2). The principal conclusion is that our proposed model is more performant in accuracy, but it has more uncertainty due to the higher loss. Instead, by using the DRCT BASE CHECKPOINT without fine tuning we can observe that the accuracy is really low, and by looking at [table 3](#table_3) it is pratically predicting all images like true, regardless of category transformation
-<a id="table_2"></a>
-<p align="center">
-  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_2.png" alt="loss weights" width="800">
-</p>
-
-<a id="table_3"></a>
-<p align="center">
-  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_3.png" alt="loss weights" width="800">
-</p>
-
-By breaking down real/fake detection accuracy separately foreach transformation category for RGB ONLY CLASS TASK CHECKPOINT in [table 4](#table_4) and DFT CLASS TASK CHECKPOINT in [table 5](#table_5) we can assert that both models are more performant in redigital category (w.r.t the original category) while lose something on the transfer category (in particular our proposed model)
-
-<a id="table_4"></a>
-<p align="center">
-  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_4.png" alt="loss weights" width="800">
-</p>
-
-<a id="table_5"></a>
-<p align="center">
-  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_5.png" alt="loss weights" width="800">
-</p>
-
-Then in order to analyze if our proposed model was really using the DFT Stem, we set to zero the weights of the parallel DFT branch and compared how the prediction in the test set changed. In particular by looking at [table 6](#table_6) and [table 7](#table_7), it is possible to note that there is a little increment in the fake detection in all categories, but we lost a very important accuracy score in the Real detection for all categories. This means that our proposed model is effectively using and learning the DFT Stem.
-<a id="table_6"></a>
-<p align="center">
-  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_6.png" alt="loss weights" width="800">
-</p>
-
-<a id="table_7"></a>
-<p align="center">
-  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_7.png" alt="loss weights" width="800">
-</p>
-
-### **Multihead fine-tuning of both models starting from our checkpoints of the previous unimodal class training task ([RGB ONLY CLASS TASK CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing) and [DFT CLASS TASK CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link)**)
-
-By looking at the [table 8](#table_8) we can assert that our proposed model is more performing in respect to the DRCTConvB base model (despite it has more uncertainty). In particular it is important to note that thanks to the new DFT Stem branch, our model is hugely particularly more accurated and balanced in category recognition (+18,37 in accuracy and +27,56 in F1-macro) and this confirm our initial hypothesis that it is more simple to detect post-processing transformation by looking also to the spectrum.
-
-<a id="table_8"></a>
-<p align="center">
-  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_8.png" alt="loss weights" width="800">
-</p>
-
-In [table 9](#table_9) are also reported the metrics for Test set, that confirms what we have seen in the validation set.
-<a id="table_9"></a>
-<p align="center">
-  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_9.png" alt="loss weights" width="800">
-</p>
 
 ### **SingleHead Category transformation detection task**
 In [table 10](#table_10) and [table 11](#table_11) are reported the metrics for Validation set and Test set respectively. The first thing we can note is that starting from a checkpoint trained on Real/Fake unimodal task, it can reach better accuracies and security on the category task, althought the process unlearned the class task. This suggests that Category task can effectively benefit from the embeddings learned during the class task

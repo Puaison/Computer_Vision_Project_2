@@ -137,9 +137,8 @@ $$
 
 
 
-## Experiments Protocol
-
-In the sections regarding we are going to report not only performances, but also answers to a bunch of questions about our proposed model with DFT Stem and the interaction between the two tasks.
+## Experiments Setup
+In this section we are going to show the raised questions about joint-training our proposed model, the different starting checkpoints used, the experiment roadpmap and the different training configurations and weights used. 
 
 </br>
 
@@ -196,7 +195,7 @@ The table below there reports the weights tested and their nominal relative cont
 </p>
 
 ## Results and discussion
-This section follows the same order presented in the experimental roadmap. The goal is to give an answer to the raised questions that motivated the experiments.
+This section follows the same order presented in the experimental roadmap. We are going to report not only performances, but also answers to the raised questions about our proposed model with DFT Stem and the interaction between the two tasks.
 
 ### E1 -- Single Head Real/Ai Images Classification task
 The first experiments evaluates how models detect real/AI images under different post-processing transformations. We compare:
@@ -289,23 +288,15 @@ We discovered from this experiment two things at the same time:
 
 This motivates the use of a joint multi-head training combined loss.
 
-**Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link)** on the Subset created from the RRDataset and used the combined weighted loss $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 1 $ with the same configuration and learning rates of the single head tasks. Then compared this joint learning with the unimodal learnings from the same starting checkpoint
+### E4 -- Joint training from a common initialization
+
+In this experiment we trained the proposed DRCTConvB-DFT model from the DRCT Base Checkpoint using both heads at the same time with $w_{\mathrm{AI/R}} = 1$ and $w_{cat} = 1$. Then we compared this joint training with the corresponding single-head trainings starting from the same checkpoint (DRCT Base Checkpoint) and using the he same configurations and learning rates.
+
+
 
 Brief results: the joint training improve both the task with respect to two unimodal tasks that starts from the same inital point [DRCTConvB Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link)
 
-**Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with different loss weight combinations** and analyzed how the performances changed.
-
-Brief result: We confirmed that the category task benefits and highly depends from the class task and it follows the class task's training velocity despite the weight assigned to it is bigger. And bigger the weight, more at the end bring better result in that category instead of the other task.
-
-
-
-
-## Results
-In this section we are going to show the metrics and performances of the five experiments conducted. Our proposed model will be higlited in blue.
-
-
-### **Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link)**
-In [table 12](#table_12) and [table 13](#table_13) are reported the metrics for the joint training and the unimodal tranings both for class and category respectively for validation and test set. We can notice very quickly that the multimodal training brings better perfomances in both task, suggesting that both tasks can benefit from each other.
+In [table 12](#table_12) and [table 13](#table_13) are reported the metrics respectively for validation and test set. Joint training improved both tha class task and the category, suggesting that both tasks can benefit from each other and provide complementary supervision when optimized together.
 <a id="table_12"></a>
 <p align="center">
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_12.png" alt="loss weights" width="800">
@@ -315,13 +306,19 @@ In [table 12](#table_12) and [table 13](#table_13) are reported the metrics for 
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_13.png" alt="loss weights" width="800">
 </p>
 
-By looking to [table 14](#table_14) it seems that the Single-head model is better in finding AI Images, but losses perfomances as seen before in the transfer category. While Multi-head is more accurate on real Images.
+By looking at [Table 14](#table_14) the Single-head model appears to be stronger at detecting AI images (except for transfer category), but it loses heavy perfomances on detecting real images w.r.t. the multi-head model. Moreover, the multi-head model maintains more consistent accuracy across transformation categories than the single-head model.
 <a id="table_14"></a>
 <p align="center">
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_14.png" alt="loss weights" width="800">
 </p>
 
-### **Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with different loss weight combinations**
+### E5 --
+
+**Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with different loss weight combinations** and analyzed how the performances changed.
+
+Brief result: We confirmed that the category task benefits and highly depends from the class task and it follows the class task's training velocity despite the weight assigned to it is bigger. And bigger the weight, more at the end bring better result in that category instead of the other task.
+
+**Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with different loss weight combinations**
 In [table 15](#table_15) and [table 16](#table_16) are reported the metrics for different weights combination on validation and test sets respectively. There is a very little differences, but we can assert that if the principal task is to detect Ai/Real, use $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 1 $. If it is necessary something balanced then use $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 2.7665 $. If the principal task is category detection, then use $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 5 $. 
 
 <a id="table_15"></a>

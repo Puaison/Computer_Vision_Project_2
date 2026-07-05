@@ -246,9 +246,7 @@ To verify if our proposed model (DRCTConvB-DFT) is really using the DFT Stem bra
 
 In this second experiment, we started from our checkpoints already trained on th real/AI task (RGB-Only Class Task Checkpoint and DFT Class Task Checkpoint) and added a second head for category classification. Then we compared the RGB-only DRCTConvB model with our proposed model DRCTConvB-DFT under the same fine-tuning procedure described in this [section](#multi-head-category-fine-tuning-strategy-from-class-task-checkpoints).
 
-
-
-By looking at the [table 8](#table_8) we can assert that our proposed model is more performing in respect to the DRCTConvB base model (despite it has more uncertainty). In particular it is important to note that thanks to the new DFT Stem branch, our model is hugely particularly more accurated and balanced in category recognition (+18,37 in accuracy and +27,56 in F1-macro) and this confirm our initial hypothesis that it is more simple to detect post-processing transformation by looking also to the spectrum.
+The validation results are reported [table 8](#table_8). We can assert that the proposed model is slightly better in real/AI detection performances (despite it has more uncertainty), but the most important improvement appears in the category task. Thanks to the new DFT Stem branch, our model is hugely more accurated and balanced in category transformation recognition, with a **+18,37 percentage points in accuracy** and **+27,56 percentage points in F1-macro**.
 
 <a id="table_8"></a>
 <p align="center">
@@ -261,9 +259,10 @@ In [table 9](#table_9) are also reported the metrics for Test set, that confirms
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_9.png" alt="loss weights" width="800">
 </p>
 
-From these first two experiments we noted that our proposed model is better than the base DRCT detector, so from now on all the experiment will be done with our proposed model.
+From these first two experiments we can confirm that our proposed model is better than the base DRCT detector, and in particular frequency-domain informations are especially useful for recognizing post-processing transformations. This supports our initial hypothesis that such transformations can leave detectable signatures in the spectrum
 
-**SingleHead Category transformation detection task** (from now we will refer to as **category task**):
+
+### E3 -- **SingleHead Category transformation detection task**:
 - Starting from the [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) we fine tuned the proposed model on the Subset created from the RRDataset and used only the category detection loss.
 - Starting from our personal [DFT CLASS TASK CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link), we fine tuned the proposed model on the Subset created from the RRDataset and used only the category detection loss.
 - Compared the results

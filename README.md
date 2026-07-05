@@ -312,14 +312,17 @@ By looking at [Table 14](#table_14) the Single-head model appears to be stronger
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_14.png" alt="loss weights" width="800">
 </p>
 
-### E5 --
+### E5 -- Loss weight ablation
 
-**Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with different loss weight combinations** and analyzed how the performances changed.
+In the final experiment we studied how the realtive weight of the two lossess for the two tasks affects the trade-off between Real/AI detection and category classification. We kept $w_{\mathrm{AI/R}} = 1$ fixed and varied $w_{\mathrm{cat}}$.
 
 Brief result: We confirmed that the category task benefits and highly depends from the class task and it follows the class task's training velocity despite the weight assigned to it is bigger. And bigger the weight, more at the end bring better result in that category instead of the other task.
 
 **Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) with different loss weight combinations**
-In [table 15](#table_15) and [table 16](#table_16) are reported the metrics for different weights combination on validation and test sets respectively. There is a very little differences, but we can assert that if the principal task is to detect Ai/Real, use $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 1 $. If it is necessary something balanced then use $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 2.7665 $. If the principal task is category detection, then use $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 5 $. 
+In [table 15](#table_15) and [table 16](#table_16) are reported the metrics for different weights combination on validation and test sets respectively. Instead, in [table 17](#table_17) are reported the means of the same metrics between test and validation sets. The differences between configurations are not extremely large, but we can extract these practical guidelines: 
+- If the principal task is to **detect Ai/Real**, use $w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 1$;
+-  If it is necessary a **balance trade-off**, use $w_{\mathrm{AI/R}} = 1$ and $ w_{cat} = 2.7665 $;
+-  If the principal task is **category classification**, then use $w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 5$. 
 
 <a id="table_15"></a>
 <p align="center">
@@ -329,9 +332,12 @@ In [table 15](#table_15) and [table 16](#table_16) are reported the metrics for 
 <p align="center">
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_16.png" alt="loss weights" width="800">
 </p>
+<a id="table_17"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_17.png" alt="loss weights" width="800">
+</p>
 
-But what is important to note is in the training process:
-By looking at the [training graphs](#graphs), regardless of the weight assigned to the Category term, it follows the velocity learning of the Class term. In fact, when the weight contribution regarding the class is very low, the category loss reached the amount of 0.20 only in the 6-th epoch (altough it had a very big weight), while in the other weightening configuration reached that value on the epochs before (even if the weight was really low). This confirms that the category task is "leeching" from the class task.
+By looking at the [training graphs](#graphs) of the loss terms, regardless of the nominal weight assigned to the category loss term, **it follows the learning dynamics of the real/AI detection task**. For example, in the last configuration, where the real/AI detection task has a low nominal weight, the category loss reached the value of **0.20 only in the 6-th epoch** (altough it had a big nominal weight), while in the others weighting configurations it reached that value earlier (even in configurations where its nominal weight was low). This confirms that the category task strongly depends on the shared representation learned combined with the class task, and it is not driven only by its explicit loss.
 
 <a id="graphs"></a>
 <p align="center">
@@ -340,20 +346,20 @@ By looking at the [training graphs](#graphs), regardless of the weight assigned 
 
 
 
-In [table 17](#table_17), we can notice that there is a general trend between the different configuration of weightings that in redigital and transfer category it is more powerful in detecting AI images but less powerful in detecting Real Images. 
-<a id="table_17"></a>
+In addition, as shown in [table 18](#table_18), we can see that there is a recurring pattern between the different weighting configurations: the models are more accurate at detecting AI-generated images on redigital and transfer category than in the original category, but they lose some performances at detecting real images in those same categories. 
+<a id="table_18"></a>
 <p align="center">
-  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_17.png" alt="loss weights" width="800">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_18.png" alt="loss weights" width="800">
 </p>
 
 ## Conclusion
 In this project we have seen that:
-- Our proposed model that is DRCTConvB with a parallel DFT Stem is generally better than the base DRCTConvB in the classification of AI/Real Images.
-- Jointly combining the two tasks can achieve even better results in detection and post-processing classification, but the most important thing is that category transformation classification benefits from the other task (it is like a leech)
+- Our proposed model that is DRCTConvB with a parallel DFT Stem has generally better performance than the base DRCTConvB in the classification of AI/Real Images.
+- Jointly combining the two tasks can achieve even better results in detection of AI images and post-processing classification, but the most important result found is that category transformation classification benefits from the class task (like a leech).
 In fact our proposed model overperformed the overall accuracy reported in the work of [RRDatatset](#li2025) even using 1/6 of the original dataset.
 
 ## Future works
-It would interesting to replicate the fifth experiment with the whole [RRDatatset](#li2025) and using the same training configuration used by the authors of the Dataset to see what performances the proposed model can reach.
+It would interesting to replicate the last experiment with the whole [RRDatatset](#li2025), using the same training configuration of the authors of the Dataset to see what performances our proposed model can reach.
 
 
 # References

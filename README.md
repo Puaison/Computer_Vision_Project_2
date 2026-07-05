@@ -263,11 +263,31 @@ From these first two experiments we can confirm that our proposed model is bette
 
 
 ### E3 -- **SingleHead Category transformation detection task**:
-- Starting from the [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) we fine tuned the proposed model on the Subset created from the RRDataset and used only the category detection loss.
-- Starting from our personal [DFT CLASS TASK CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link), we fine tuned the proposed model on the Subset created from the RRDataset and used only the category detection loss.
-- Compared the results
 
-Brief result: If the model has already learned features for the **class task**, then **category task** benefits from them and reach better result while disrupting the class accuracy. 
+In this experiment we studied if the category task benefits from representations previously learned for real/AI detection.
+
+We compared two different starting points for DRCTConvB-DFT:
+- category-only training starting from the DRCT Base Checkpoint;
+- category-only training starting from the DFT Class Task Checkpoint, which was previously fine-tuned for the class task.
+
+
+In [table 10](#table_10) and [table 11](#table_11) are reported the metrics for Validation set and Test set respectively. Starting from a checkpoint trained on Real/Fake Single-Head task, it leads to better performance and security on the category task detection. This suggests that category task can effectively benefit from the embeddings and features learned for the class task.
+<a id="table_10"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_10.png" alt="loss weights" width="800">
+</p>
+<a id="table_11"></a>
+<p align="center">
+  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_11.png" alt="loss weights" width="800">
+</p>
+
+However, as this experiment optimizes only the category loss, the model forgot some of the previous Real/AI detection abilities.
+
+We discovered from this experiment two things at the same time:
+1) Real/AI fine-tuning helps category task;
+2) category-only fine-tuning is not enough to preserve real/Ai detection performances.
+
+This motivates the use of a joint multi-head training combined loss.
 
 **Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link)** on the Subset created from the RRDataset and used the combined weighted loss $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 1 $ with the same configuration and learning rates of the single head tasks. Then compared this joint learning with the unimodal learnings from the same starting checkpoint
 
@@ -283,17 +303,6 @@ Brief result: We confirmed that the category task benefits and highly depends fr
 ## Results
 In this section we are going to show the metrics and performances of the five experiments conducted. Our proposed model will be higlited in blue.
 
-
-### **SingleHead Category transformation detection task**
-In [table 10](#table_10) and [table 11](#table_11) are reported the metrics for Validation set and Test set respectively. The first thing we can note is that starting from a checkpoint trained on Real/Fake unimodal task, it can reach better accuracies and security on the category task, althought the process unlearned the class task. This suggests that Category task can effectively benefit from the embeddings learned during the class task
-<a id="table_10"></a>
-<p align="center">
-  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_10.png" alt="loss weights" width="800">
-</p>
-<a id="table_11"></a>
-<p align="center">
-  <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_11.png" alt="loss weights" width="800">
-</p>
 
 ### **Multihead training of the proposed model starting from [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link)**
 In [table 12](#table_12) and [table 13](#table_13) are reported the metrics for the joint training and the unimodal tranings both for class and category respectively for validation and test set. We can notice very quickly that the multimodal training brings better perfomances in both task, suggesting that both tasks can benefit from each other.

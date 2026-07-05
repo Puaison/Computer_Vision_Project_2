@@ -244,10 +244,9 @@ To verify if our proposed model (DRCTConvB-DFT) is really using the DFT Stem bra
 
 ### E2 -- Multi-head category fine-tuning from class-task checkpoints
 
+In this second experiment, we started from our checkpoints already trained on th real/AI task (RGB-Only Class Task Checkpoint and DFT Class Task Checkpoint) and added a second head for category classification. Then we compared the RGB-only DRCTConvB model with our proposed model DRCTConvB-DFT under the same fine-tuning procedure described in this [section](#multi-head-category-fine-tuning-strategy-from-class-task-checkpoints).
 
-Brief result: Confirmed that our proposed model has sliglty better perfomances in AI/Real detection, while outperformed in category transformation detection. 
 
-### **Multihead fine-tuning of both models starting from our checkpoints of the previous unimodal class training task ([RGB ONLY CLASS TASK CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing) and [DFT CLASS TASK CHECKPOINT](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link)**)
 
 By looking at the [table 8](#table_8) we can assert that our proposed model is more performing in respect to the DRCTConvB base model (despite it has more uncertainty). In particular it is important to note that thanks to the new DFT Stem branch, our model is hugely particularly more accurated and balanced in category recognition (+18,37 in accuracy and +27,56 in F1-macro) and this confirm our initial hypothesis that it is more simple to detect post-processing transformation by looking also to the spectrum.
 

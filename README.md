@@ -185,9 +185,9 @@ When the category head is added to a checkpoint already trained on the Real/Ai d
 2) **Joint fine-tuning**: unfreeze the whole model and optimize both heads together with the combined loss weights of $w_{\mathrm{AI/R}} = 0.1$ (as being already trained to detect fake images) and $w_{cat} = 1$. In addition, set different learning rates to different parts of the model to not disrupt the representations learned for class tasks while adapting to the category task.
 
 ### Loss-weight ablation
-Before running the final loss-weight ablation, we have done some experiments with differnt learning rates while keeping fixed $ w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 1 $ to identify which is the best learning rate for the MultiHead configuration. We have found that the best is **3e-4**, which is then used for the loss-weight ablation.
+Before running the final loss-weight ablation, we have done some experiments with differnt learning rates while keeping fixed $w_{\mathrm{AI/R}} = 1$ and $w_{cat} = 1$ to identify which is the best learning rate for the MultiHead configuration. We have found that the best is **3e-4**, which is then used for the loss-weight ablation.
 
-The table below there reports the weights tested and their nominal relative contribution to the total combined loss (maintaining $ w_{\mathrm{AI/R}} = 1 $ fixed)
+The table below there reports the weights tested and their nominal relative contribution to the total combined loss (maintaining $w_{\mathrm{AI/R}} = 1$ fixed)
 
 <a id="loss_weights"></a>
 <p align="center">
@@ -317,9 +317,9 @@ By looking at [Table 14](#table_14) the Single-head model appears to be stronger
 In the final experiment we studied how the realtive weight of the two lossess for the two tasks affects the trade-off between Real/AI detection and category classification. We kept $w_{\mathrm{AI/R}} = 1$ fixed and varied $w_{\mathrm{cat}}$.
 
 In [table 15](#table_15) and [table 16](#table_16) are reported the metrics for different weights combination on validation and test sets respectively. Instead, in [table 17](#table_17) are reported the means of the same metrics between test and validation sets. The differences between configurations are not extremely large, but we can extract these practical guidelines: 
-- If the principal task is to **detect Ai/Real**, use $w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 1$;
--  If it is necessary a **balance trade-off**, use $w_{\mathrm{AI/R}} = 1$ and $ w_{cat} = 2.7665 $;
--  If the principal task is **category classification**, then use $w_{\mathrm{AI/R}} = 1 $ and $ w_{cat} = 5$. 
+- If the principal task is to **detect Ai/Real**, use $w_{\mathrm{AI/R}} = 1$ and $w_{cat} = 1$;
+-  If it is necessary a **balance trade-off**, use $w_{\mathrm{AI/R}} = 1$ and $w_{cat} = 2.7665$;
+-  If the principal task is **category classification**, then use $w_{\mathrm{AI/R}} = 1$ and $w_{cat} = 5$. 
 
 <a id="table_15"></a>
 <p align="center">

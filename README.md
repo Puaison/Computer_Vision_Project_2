@@ -30,7 +30,7 @@ It is important to spend some words about step 1), in particular on the criteria
 - transfer/ai
 - transfer/real
 
-Then, during training, each macro-category of 1,500 photos is divided in three splits:
+Then each macro-category of 1,500 photos is divided into three splits:
 -  train set 70% (in total 6,300=6*1,050)
 -  validation set 15% (in total 1,350=6*225)
 -  test set 15% (in total 1,350=6*225)
@@ -137,15 +137,49 @@ $$
 
 
 
-## Experiments Setup
+## Experiments Protocol
+
+In the sections regarding we are going to report not only performances, but also answers to a bunch of questions about our proposed model with DFT Stem and the interaction between the two tasks.
+
+</br>
 
 **N.B.** I took inspiration and adapted the Train and Test Loop skeletons from one of my previous projects in which I worked and collaborated in: https://github.com/cybernetic-m/DAgger4Robotics
 
-However I did significant changes in order to adapt those skeletons to this work.
-</br>
-</br>
-</br>
-In this section we are going to describe the setup for the experiments done. We used our proposed model with DFT Stem and the DRCTConvB detector.
+However the code was significantly modified to fit the models and tasks of this work.
+
+### Tasks
+
+We consider two supervised tasks:
+| Task name | Description | Number of classes |
+|---|---|---:|
+| **Class task** | Real vs AI-generated image classification | 2 |
+| **Category task** | Post-processing transformation classification | 3 |
+
+### Experimental questions
+
+1. **Does adding the parallel DFT Stem branch improve real/AI detection?**
+2. **Does the DFT branch help when the model needs to recognize post-processing transformation categories?**
+3. **Does category classification benefit from representations and embeddings learned for real/Ai detection task?**
+4. **Does joint multi-head training improve both tasks compared with training them separately?**
+5. **How do different combinations of loss weights affect the trade-off between the two tasks?**
+
+### Starting checkpoint used in the experiments
+| Checkpoint | Description |
+|---|---|
+| [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) | Original DRCTConvB checkpoint before fine-tuning on our Dataset. |
+| [RGB-Only Class Task Checkpoint](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing) | DRCTConvB fine-tuned on our Dataset in the class task only. |
+| [DFT Class Task Checkpoint](https://drive.google.com/file/d/1kK0usJh56bbYRQF_q6rKHMVO0IYqv4uT/view?usp=drive_link) | DRCTConvB-DFT fine-tuned on our Dataset in the class task only. |
+
+### Experiments roadmap
+
+| ID | Experiment | Model(s) | Initialization | Metrics considered | Purpose |
+|---|---|---|---|---|---|
+| E1 | Single-head class task | DRCTConvB, DRCTConvB-DFT | DRCT Base Checkpoint | Class accuracy only | Test if DFT helps the real/AI task and if fine-tuning is necessary.|
+| E2 | Multi-head fine-tuning from class checkpoints | DRCTConvB, DRCTConvB-DFT | RGB-Only Class Task Checkpoint, DFT Class Task Checkpoint | Category accuracy-F1 only |  Through a Category-head warm-up and then a joint loss, test if DFT features help category detection when the model was previously trained on class task. |
+| E3 | Single-head category task | DRCTConvB-DFT | DRCT Base Checkpoint or DFT Class Task Checkpoint | Category accuracy-F1 only | Test if category task benefits from class task pretraining, and if catastrophic unlearning occurs. |
+| E4 | Joint training from a common initialization | DRCTConvB-DFT | DRCT Base Checkpoint | Class and Category accuracy-F1 | Compare joint training against the corresponding single-task trainings from the same starting point. |
+| E5 | Loss-weight ablation | DRCTConvB-DFT | DRCT Base Checkpoint | Class and Category accuracy-F1 | Using a Joint loss with different $w_{\mathrm{cat}}$ , keeping $w_{\mathrm{AI/R}} = 1$ , we study the trade-off between real/AI detection and category transformation classification. |
+
 
 **Single Head Classification Real/AI task** (from now we will refer to as **class task**):
 - Starting from the [DRCT Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link) we fine tuned the DRCTConvB model on the Subset created from the RRDataset and used only the class AI/Real loss. We will call this checkpoint from now on as [RGB ONLY CLASS TASK CHECKPOINT](https://drive.google.com/file/d/18BRyXCF1kSpfi2IGsXEI7j5fRCinoO-s/view?usp=sharing)

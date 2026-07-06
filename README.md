@@ -347,10 +347,9 @@ In addition, as shown in [table 18](#table_18), we can see that there is a recur
 In this project we have seen that:
 - Our proposed model that is DRCTConvB with a parallel DFT Stem has generally better performance than the base DRCTConvB in the classification of AI/Real Images.
 - Jointly combining the two tasks can achieve even better results in detection of AI images and post-processing classification, but the most important result found is that category transformation classification benefits from the class task (like a leech);
-- Our poposed model seems to be better in the detection of re-digitalized AI-images w.r.t. the results presented for DRCTConvB in [RRBench](#li2025).
 
 ## Future works
-It would interesting to replicate the last experiment with the whole [RRDatatset](#li2025), using the same training configuration of the authors of the Benchmark to see what performances our proposed model can achieve.
+It would interesting to replicate the last experiment with the whole [RRDatatset](#li2025), using the same training configuration of the authors of the Benchmark to see what performances our proposed model can achieve across transformations.
 
 
 # References

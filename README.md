@@ -98,30 +98,24 @@ Below there is the image of the structure of our new proposed model with the two
 </p>
 
 ## Loss function
-Both tasks are trained with cross-entropy loss. For one sample with the true class prediction as $y$, the cross-entropy-loss is:
 
-$$
-CE(y, \hat{y}) = - \log(\hat{y}_{y})
-$$
-
-where $\hat{y}_{y}$ is the probability predicted of the correct class assigned to y by the model.
-Despite when trained singularly there is no necessity to normalize to the same scale the loss, while comparing a binary with a ternary loss is necessary a normalization.
-In fact, when the model assigns uniformely the sample to all the K classes of the problem, it will produce. 
+The loss function used for both tasks is cross-entropy. 
+In single-task training, no normalization of the loss is needed. In joint training, we combine a binary cross-entropy loss with a three-classes cross-entropy loss. These two losses have different natural scale. In fact, when the model assigns equal probability to all K classes of the problem, then: 
 
 $$
 CE(y, \hat{y}) = - \log(\frac{1}{K}) = \log(K)
 $$
 
 
-Then we obtain that:
+Then we normalize each task loss by its own uniform probability prediction error:
 
 $$
 CE_{\mathrm{norm}} =\frac{CE(y, \hat{y})}{\log(K)} 
 $$
 
-When the model assign the probability uniformily, then $CE_{\mathrm{norm}}=1$
+With this normalization, a model with uniform prediction gives then $CE_{\mathrm{norm}}=1$.
 
-The combined weighted loss for the joint tasks detection is given by:
+The combined weighted loss used for the joint tasks training is given by:
 
 $$
 \mathcal{L} =
@@ -352,11 +346,11 @@ In addition, as shown in [table 18](#table_18), we can see that there is a recur
 ## Conclusion
 In this project we have seen that:
 - Our proposed model that is DRCTConvB with a parallel DFT Stem has generally better performance than the base DRCTConvB in the classification of AI/Real Images.
-- Jointly combining the two tasks can achieve even better results in detection of AI images and post-processing classification, but the most important result found is that category transformation classification benefits from the class task (like a leech).
-In fact our proposed model overperformed the overall accuracy reported in the work of [RRDatatset](#li2025) even using 1/6 of the original dataset.
+- Jointly combining the two tasks can achieve even better results in detection of AI images and post-processing classification, but the most important result found is that category transformation classification benefits from the class task (like a leech);
+- Our poposed model seems to be better in the detection of re-digitalized AI-images w.r.t. the results presented for DRCTConvB in [RRBench](#li2025).
 
 ## Future works
-It would interesting to replicate the last experiment with the whole [RRDatatset](#li2025), using the same training configuration of the authors of the Dataset to see what performances our proposed model can reach.
+It would interesting to replicate the last experiment with the whole [RRDatatset](#li2025), using the same training configuration of the authors of the Benchmark to see what performances our proposed model can achieve.
 
 
 # References

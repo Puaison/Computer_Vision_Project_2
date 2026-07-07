@@ -1,28 +1,28 @@
 # Project 2: Joint Detection of AI-Generated Images and Post-Processing Alterations in Real-World Scenarios
 ## Abstract:
-AI-Generated Image detectors are usually trained and evaluated in idealized conditions. But in real world scenario, images undergo post-processing transformations, which can introduce a degradation signature and artifacts in the image-pattern and lead the detectors in error. In this context it is inserted the work of [Li et al. (2025)](#li2025). The authors introduced a new Benchmark Dataset (called **RRDataset**) containing images under three different format categories: original images, images modified by the transmition through the internet, and images modified by a redigitalization process. In their work, several state-of-the-art AI-detectors were fine-tuned on their Dataset contaning these eterogeneous images, and then they analyzed how the real/fake detection changed across the transformations (w.r.t. the origianl scenario).
+AI-Generated Image detectors are usually trained and evaluated in idealized conditions. But in real world scenarios, images undergo post-processing transformations, which can introduce a degradation signature and artifacts in the image-pattern and lead the detectors in error. In this context it is inserted the work of [Li et al. (2025)](#li2025). The authors introduced a new Benchmark Dataset (called **RRDataset/RRBench**) containing images under three different format categories: original images, images modified by the transmission through the internet, and images modified by a redigitalization process. In their work, several state-of-the-art AI-detectors were fine-tuned on their Dataset contaning these eterogeneous images, and then they analyzed how the real/fake detection changed across the transformations (w.r.t. the original scenario).
 
 In this project, we are going further and extended that setting in two main directions:
-- We do not only classify Real/AI Images, but we also identify to which **post-processing  category transformaton** images belong; This is done in a **joint multi-task learning fashion** and this allows us to understand if one task can benefit from the features and model-weights learned from the other task or if they compete, resulting in the degradation of both tasks' performances during joint-training. 
-- We adapted the [DRCTConvNext_Base detector](#chen2024drct) by adding a parallel Stem branch which processes the amplitude of the **Discrete Fourier Transform (DFT)**, The motivation relies on the hypothesis that some post-processing transformations can leave detectable traces in the frequency spectrum (and acting like a low-pass or high-pass filter).
+- We do not only classify Real/AI Images, but we also identify to which **post-processing category transformation** images belong; This is done in a **joint multi-task learning fashion** and this allows us to understand if one task can benefit from the features and model-weights learned from the other task or if they compete, resulting in the degradation of both tasks' performances during joint-training. 
+- We adapted the [DRCTConvNext_Base detector](#chen2024drct) by adding a parallel Stem branch which processes the amplitude of the **Discrete Fourier Transform (DFT)**. The motivation relies on the hypothesis that some post-processing transformations can leave detectable traces in the frequency spectrum (and acting like a low-pass or high-pass filter).
 
-The proposed model, called DRCTConvB-DFT, combines both RGB information and DFT informations as a shared backbone. It uses two heads to generate the output: one that takes into account Real/AI detection and the other for category post-processing classification.
+The proposed model, called **DRCTConvB-DFT**, combines both RGB informations and DFT informations as a shared backbone. It uses two heads to generate the output: one that takes into account Real/AI detection and the other for category post-processing classification.
 
 
 ## Dataset
-All experiments were perfomred on a subset (both balanced in Real/Ai classes and in category transformations) of RRDataset. We trained the models in the Google Colab Environment (in particular on T4 and A100 GPUs) as we did not have access to powerful local machines. The drowback is that at the beginning of every Colab session we need to re-load the Dataset in /content/, and this is impractical if we are using the complete RRDataset which size is around 20 GB. Also using the Dataset from Google Drive is impractical as, during training, most of the time would be lost in I/O passages between Colab and Drive.
+All experiments were performed on a subset (both balanced in Real/Ai classes and in category transformations) of RRDataset. We trained the models in the Google Colab Environment (in particular on T4 and A100 GPUs) as we did not have access to powerful local machines. The drowback is that at the beginning of every Colab session we need to re-load the Dataset in /content/, and this is impractical if we are using the complete RRDataset which size is around 20 GB. Also using the Dataset from Google Drive is impractical as, during training, most of the time would be lost in I/O passages between Colab and Drive.
 
 For this reason we used the following procedure:
 1) The Creation of a subset of **9,000 Images** (**3.4 GB**)
-2) The Compression of this subset (this does not reduce the size, but it makes copying faster).
+2) The Compression of this subset (this does not reduce the size, but it makes copying faster)
 3) The Storing of this archive in the Google Drive
 4) The Download of this archive in /content/ of Google Colab
 5) The Locally Extraction of this archive in /content/
 6) The Creation of the train,validation and test splits
 
-While passage 1-2-3 can be done only once, we need to repeat passage 4-5-6 at the beginning of every Colab session. This is faster than repeatedly downloading and using the subset raw folder as is. 
+While passages 1-2-3 can be done only once, we need to repeat passages 4-5-6 at the beginning of every Colab session. This is faster than repeatedly downloading and using the subset raw folder as is. 
 
-It is important to spend some words about step 1), in particular on the criteria of the balanced data split; I divided the Images in six big families, and took **1,500 images** for each group:
+It is important to spend some words about step 1), in particular on the criteria for creating a balanced subset; we divided the images into six big families, and took **1,500 images** for each group:
 - original/ai
 - original/real
 - redigital/ai
@@ -39,7 +39,7 @@ This ensures split balance both in real/fake classes and transformation categori
 
 The subset creation is implemented in this [notebook](https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Subset_creator.ipynb)
 
-Another important features is the possibility to choose between **Lazy Loading** and **Eager Loading**:
+Another important feature is the possibility to choose between **Lazy Loading** and **Eager Loading**:
 - With **Lazy Loading** the DataLoader will re-load the image and re-compute the DFT Amplitude every time the image is requested. With A100 GPU, in every epoch it loses about 40/50 seconds in this process.
 - With **Eager Loading** the DataLoader will load and compute the DFT Amplitude of the image at the beginning of the Colab Session and then it will store them in the GPU memory. With A100 GPU the Eager loading takes about 4 minutes, but then we recover 40/50 seconds in each epoch of training. The drowaback is that it requires around 17-18 GB of GPU memory. 
 
@@ -49,7 +49,7 @@ The subset archive can be downloaded [here](https://drive.google.com/file/d/1Y9W
 
 As mentioned in the abstract, in this project we propose a new multi-head model based on the [DRCTConvB](#chen2024drct) detector that takes in input not only RGB features, but also the DFT Amplitude features. The name is **DRCTConvB-DFT**. 
 
-[DRCTConvB](#chen2024drct) (the baseline of this project) is a modification of the [ConvNeXt_Base](#convnext), a Network from the ConvNeXt family. ConvNeXt architectures modernize ResNet-style CNNs by adapting and incorporating some ideas and design choiches that became popular and common in the Vision Transformers, resulting in CNN Models that can compete with Transformers in vision tasks.
+[DRCTConvB](#chen2024drct) (**the baseline of this project**) is a modification of the [ConvNeXt_Base](#convnext), a Network from the ConvNeXt family. ConvNeXt architectures modernize ResNet-style CNNs by adapting and incorporating some ideas and design choiches that became popular and common in the Vision Transformers, resulting in CNN Models that can compete with Transformers in vision tasks.
 <a id="ConvNeXt_architecture"></a>
 <p align="center">
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Base_Model_centered.jpg" alt="BaseConvNeXt" width="200">
@@ -59,7 +59,7 @@ As mentioned in the abstract, in this project we propose a new multi-head model 
   </sub>
 </p>
 
-The author of [DRCT](#chen2024drct) transformed the [ConvNeXt_Base](#convnext) original head in a features extractor and glued a the end of the network a new binary head (the pink block in the image below) that outputs two logits: one for real images and one for AI-generated images.
+The author of [DRCT](#chen2024drct) transformed the [ConvNeXt_Base](#convnext) original head in a features extractor and added at the end of the network a new binary head (the pink block in the image below) that outputs two logits: one for real images and one for AI-generated images.
 
 <a id="DRCT_architecture"></a>
 <p align="center">
@@ -70,13 +70,13 @@ The author of [DRCT](#chen2024drct) transformed the [ConvNeXt_Base](#convnext) o
   </sub>
 </p>
 
-In [RRDataset](#li2025) benchamrk, DRCTConvB was reported as the strongest detector among the considered models when fine-tuned and used in real world detection of AI degraded Images.
+In [RRBench](#li2025), DRCTConvB was reported as the strongest detector among the considered models when fine-tuned and used in real world detection of AI degraded Images, although its performance still drops under re-digitalization transformations.
 
 
-Our proposed model extends DRCTConvB by adding a parallel frequency-domain branch.
-The main idea is to give to the network access not only to the RGB Image processed by the original ConvNeXt Stem, but also to the DFT amplitude of the Image as it may contain informations about the undergone post-processing transformation.
+Our proposed model extends DRCTConvB by adding an initial parallel frequency-domain branch.
+The main idea is to give to the network access not only to the RGB Image processed by the original ConvNeXt Stem, but to give access also to the DFT amplitude of the Image as it may contain informations about the undergone post-processing transformation.
 
-The DFT Stem has the same structure as the original RGB Stem. But a convolutional layer, by itself, cannot distinguish if a local patch comes from the region of high frequencies or low frequencies. To solve this problem, we concatenate a **Normalized Radial Map** to the DFT amplitude along channel dimension. Each pixel of the Radial Map contains the normalized distance from the center. In this way, the network can associate the DFT Amplitude portions to their corresponding frequency ranges. A the end, the feature maps of the DFT branch are summed pixel-wise with the feature maps of the RGB original Stem branch.
+The DFT Stem has the same structure as the original RGB Stem. But a convolutional layer, by itself, cannot distinguish if a local patch comes from the region of high frequencies or low frequencies. To solve this problem, we concatenate a **Normalized Radial Map** to the DFT amplitude along channel dimension. Each pixel of the Radial Map contains the normalized distance from the center. In this way, the network can associate the DFT Amplitude portions to their corresponding frequency ranges. A the end of the DFT Stem, the feature maps of the DFT branch are summed pixel-wise with the feature maps of the RGB original Stem branch.
 
 To summaryze the structure and the flow of the new proposed model:
 1. The RGB image is analyzed by the original RGB Stem.
@@ -87,7 +87,7 @@ To summaryze the structure and the flow of the new proposed model:
    - a **real/AI class head** which returns 2 logits;
    - a **category transformation head** which returns 3 logits. 
 
-Below there is the image of the structure of our new proposed model with the two different heads and the parallel DFT Stem. The block marked in green are the blocks that we added.
+Below there is the image of the structure of our new proposed model with the two different heads and the initial parallel DFT Stem. The blocks marked in green are the components that we added.
 <a id="prposed_architecture"></a>
 <p align="center">
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/DFT_model_centered.jpg" alt="Model architecture" width="600">

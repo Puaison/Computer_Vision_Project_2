@@ -107,13 +107,13 @@ CE(y, \hat{y}) = - \log(\frac{1}{K}) = \log(K)
 $$
 
 
-Then we normalize each task loss by its own uniform probability prediction error:
+We normalize each task loss by its own uniform probability prediction error:
 
 $$
 CE_{\mathrm{norm}} =\frac{CE(y, \hat{y})}{\log(K)} 
 $$
 
-With this normalization, a model with uniform prediction gives then $CE_{\mathrm{norm}}=1$.
+With this normalization, a model with uniform prediction gives $CE_{\mathrm{norm}}=1$.
 
 The combined weighted loss used for the joint tasks training is given by:
 
@@ -142,7 +142,7 @@ However the code was significantly modified to fit the models and tasks of this 
 
 ### Tasks
 
-We consider two supervised tasks:
+We considered two supervised tasks, and below are reported the definition of each task:
 | Task name | Description | Number of classes |
 |---|---|---:|
 | **Class task** | Real vs AI-generated image classification | 2 |
@@ -152,7 +152,7 @@ We consider two supervised tasks:
 
 1. **Does adding the parallel DFT Stem branch improve real/AI detection?**
 2. **Does the DFT branch help when the model needs to recognize post-processing transformation categories?**
-3. **Does category classification benefit from representations and embeddings learned for real/Ai detection task?**
+3. **Does category classification benefit from representations and embeddings learned for real/AI detection task?**
 4. **Does joint multi-head training improve both tasks compared with training them separately?**
 5. **How do different combinations of loss weights affect the trade-off between the two tasks?**
 
@@ -167,11 +167,11 @@ We consider two supervised tasks:
 
 | ID | Experiment | Model(s) | Initialization | Metrics considered | Purpose |
 |---|---|---|---|---|---|
-| E1 | Single-head class task | DRCTConvB, DRCTConvB-DFT | DRCT Base Checkpoint | Class accuracy only | Test if DFT helps the real/AI task and if fine-tuning is necessary.|
-| E2 | Multi-head category fine-tuning from class-task checkpoints | DRCTConvB, DRCTConvB-DFT | RGB-Only Class Task Checkpoint, DFT Class Task Checkpoint | Category accuracy-F1 only |  Through a Category-head warm-up and then a joint loss, test if DFT features help category detection when the model was previously trained on class task. |
-| E3 | Single-head category task | DRCTConvB-DFT | DRCT Base Checkpoint or DFT Class Task Checkpoint | Category accuracy-F1 only | Test if category task benefits from class task pretraining, and if catastrophic unlearning occurs. |
+| E1 | Single-head class task training | DRCTConvB, DRCTConvB-DFT | DRCT Base Checkpoint | Class accuracy | Test if DFT helps the real/AI task and if fine-tuning is necessary.|
+| E2 | Multi-head category fine-tuning from class-task checkpoints | DRCTConvB, DRCTConvB-DFT | RGB-Only Class Task Checkpoint, DFT Class Task Checkpoint | Category accuracy-F1 |  Through a Category-head warm-up and then a joint loss, test if DFT features help category detection when the model was previously trained on class task. |
+| E3 | Single-head category task training | DRCTConvB-DFT | DRCT Base Checkpoint or DFT Class Task Checkpoint | Category accuracy-F1 | Test if category task benefits from class task pretraining, and if catastrophic unlearning occurs. |
 | E4 | Joint training from a common initialization | DRCTConvB-DFT | DRCT Base Checkpoint | Class and Category accuracy-F1 | Compare joint training against the corresponding single-task trainings from the same starting point. |
-| E5 | Loss-weight ablation | DRCTConvB-DFT | DRCT Base Checkpoint | Class and Category accuracy-F1 | Using a Joint loss with different $w_{\mathrm{cat}}$ , keeping $w_{\mathrm{AI/R}} = 1$ , we study the trade-off between real/AI detection and category transformation classification. |
+| E5 | Loss-weight ablation | DRCTConvB-DFT | DRCT Base Checkpoint | Class and Category accuracy-F1 | Using a Joint loss with different $w_{\mathrm{cat}}$ and keeping $w_{\mathrm{AI/R}} = 1$ , we study the trade-off between real/AI detection and category transformation classification. |
 
 ### Multi-head category fine-tuning strategy from class-task checkpoints
 When the category head is added to a checkpoint already trained on the Real/Ai detection task, we used a two-phases fine-tuning workflow:
@@ -181,7 +181,7 @@ When the category head is added to a checkpoint already trained on the Real/Ai d
 ### Loss-weight ablation
 Before running the final loss-weight ablation, we have done some experiments with differnt learning rates while keeping fixed $w_{\mathrm{AI/R}} = 1$ and $w_{cat} = 1$ to identify which is the best learning rate for the MultiHead configuration. We have found that the best is **3e-4**, which is then used for the loss-weight ablation.
 
-The table below there reports the weights tested and their nominal relative contribution to the total combined loss (maintaining $w_{\mathrm{AI/R}} = 1$ fixed)
+The table below reports the weights tested and their nominal relative contribution to the total combined loss (maintaining $w_{\mathrm{AI/R}} = 1$ fixed)
 
 <a id="loss_weights"></a>
 <p align="center">

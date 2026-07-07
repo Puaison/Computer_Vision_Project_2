@@ -264,7 +264,7 @@ We compared two different starting points for DRCTConvB-DFT:
 - category-only training starting from the DFT Class Task Checkpoint, which was previously fine-tuned for the class task.
 
 
-In [table 10](#table_10) and [table 11](#table_11) are reported the metrics for Validation set and Test set respectively. Starting from a checkpoint trained on Real/Fake Single-Head task, it leads to better performance and security on the category task detection. This suggests that category task can effectively benefit from the embeddings and features learned for the class task.
+In [table 10](#table_10) and [table 11](#table_11) are reported the metrics for Validation set and Test set respectively. Starting from a checkpoint trained on Real/Fake Single-Head task, it leads to better performance and security on the category task classification. This suggests that category task can effectively benefit from the embeddings and features learned for the class task.
 <a id="table_10"></a>
 <p align="center">
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_10.png" alt="loss weights" width="800">
@@ -278,15 +278,15 @@ However, as this experiment optimizes only the category loss, the model forgot s
 
 We discovered from this experiment two things at the same time:
 1) Real/AI fine-tuning helps category task;
-2) category-only fine-tuning is not enough to preserve real/Ai detection performances.
+2) category-only fine-tuning is not enough to preserve real/AI detection performance.
 
 This motivates the use of a joint multi-head training combined loss.
 
 ### E4 - Joint training from a common initialization
 
-In this experiment we trained the proposed DRCTConvB-DFT model from the DRCT Base Checkpoint using both heads at the same time with $w_{\mathrm{AI/R}} = 1$ and $w_{cat} = 1$. Then we compared this joint training with the corresponding single-head trainings starting from the same checkpoint (DRCT Base Checkpoint) and using the he same configurations and learning rates.
+In this experiment we trained the DRCTConvB-DFT model from the DRCT Base Checkpoint using both heads at the same time with $w_{\mathrm{AI/R}} = 1$ and $w_{cat} = 1$. Then we compared this joint training with the corresponding single-head trainings starting from the same checkpoint (DRCT Base Checkpoint) and using the same configurations and learning rates.
 
-In [table 12](#table_12) and [table 13](#table_13) are reported the metrics respectively for validation and test set. Joint training improved both tha class task and the category, suggesting that both tasks can benefit from each other and provide complementary supervision when optimized together.
+In [table 12](#table_12) and [table 13](#table_13) are reported the metrics for validation and test set respectively. Joint training improved both the class task and the category, suggesting that both tasks can benefit from each other and provide complementary supervision when optimized together.
 <a id="table_12"></a>
 <p align="center">
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_12.png" alt="loss weights" width="800">
@@ -296,7 +296,7 @@ In [table 12](#table_12) and [table 13](#table_13) are reported the metrics resp
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_13.png" alt="loss weights" width="800">
 </p>
 
-By looking at [Table 14](#table_14) the Single-head model appears to be stronger at detecting AI images (except for transfer category), but it loses heavy perfomances on detecting real images w.r.t. the multi-head model. Moreover, the multi-head model maintains more consistent accuracy across transformation categories than the single-head model.
+By looking at [Table 14](#table_14) the Single-head model appears to be stronger at detecting AI images (except for transfer category), but it loses heavy perfomances on detecting real images w.r.t. the multi-head model.
 <a id="table_14"></a>
 <p align="center">
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_14.png" alt="loss weights" width="800">
@@ -304,12 +304,12 @@ By looking at [Table 14](#table_14) the Single-head model appears to be stronger
 
 ### E5 - Loss weight ablation
 
-In the final experiment we studied how the realtive weight of the two lossess for the two tasks affects the trade-off between Real/AI detection and category classification. We kept $w_{\mathrm{AI/R}} = 1$ fixed and varied $w_{\mathrm{cat}}$.
+In the final experiment we studied how the relative weights of the two loss terms affect the trade-off between Real/AI detection and category classification during training. We kept $w_{\mathrm{AI/R}} = 1$ fixed and varied $w_{\mathrm{cat}}$.
 
-In [table 15](#table_15) and [table 16](#table_16) are reported the metrics for different weights combination on validation and test sets respectively. Instead, in [table 17](#table_17) are reported the means of the same metrics between test and validation sets. The differences between configurations are not extremely large, but we can extract these practical guidelines: 
-- If the principal task is to **detect Ai/Real**, use $w_{\mathrm{AI/R}} = 1$ and $w_{cat} = 1$;
--  If it is necessary a **balance trade-off**, use $w_{\mathrm{AI/R}} = 1$ and $w_{cat} = 2.7665$;
--  If the principal task is **category classification**, then use $w_{\mathrm{AI/R}} = 1$ and $w_{cat} = 5$. 
+In [table 15](#table_15) and [table 16](#table_16) are reported the metrics for different weight combination on validation and test sets respectively. Instead, in [table 17](#table_17) are reported the means of the same metrics between test and validation sets. The differences between configurations are not extremely large, but we can extract these practical guidelines: 
+- If the principal task is to **detect AI/Real images**, use $w_{\mathrm{AI/R}} = 1$ and $w_{cat} = 1$;
+- If it is necessary a **balanced trade-off**, use $w_{\mathrm{AI/R}} = 1$ and $w_{cat} = 2.7665$;
+- If the principal task is **category classification of images**, use $w_{\mathrm{AI/R}} = 1$ and $w_{cat} = 5$. 
 
 <a id="table_15"></a>
 <p align="center">
@@ -324,7 +324,7 @@ In [table 15](#table_15) and [table 16](#table_16) are reported the metrics for 
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_17.png" alt="loss weights" width="800">
 </p>
 
-By looking at the [training graphs](#graphs) of the loss terms, regardless of the nominal weight assigned to the category loss term, **it follows the learning dynamics of the real/AI detection task**. For example, in the last configuration, where the real/AI detection task has a low nominal weight, the category loss reached the value of **0.20 only in the 6-th epoch** (altough it had a big nominal weight), while in the others weighting configurations it reached that value earlier (even in configurations where its nominal weight was low). This confirms that the category task strongly depends on the shared representation learned combined with the class task, and it is not driven only by its explicit loss.
+By looking at the [training graphs](#graphs) of the loss terms, regardless of the nominal weight assigned to the category loss term, **it follows the learning dynamics of the real/AI detection task**. For example, in the last configuration, where the real/AI detection task has a low nominal weight, the category loss reached the value of **0.20 only in the 6-th epoch** (although it had a big nominal weight), while in the others weighting configurations it reached that value earlier (even in configurations where its nominal weight was low). This confirms again that the category task strongly depends on the shared representation learned with the class task, and it is not driven only by its explicit loss.
 
 <a id="graphs"></a>
 <p align="center">
@@ -333,7 +333,7 @@ By looking at the [training graphs](#graphs) of the loss terms, regardless of th
 
 
 
-In addition, as shown in [table 18](#table_18), we can see that there is a recurring pattern between the different weighting configurations: the models are more accurate at detecting AI-generated images on redigital and transfer category than in the original category, but they lose some performances at detecting real images in those same categories. 
+In addition, as shown in [table 18](#table_18), we can see that there is a recurring pattern between the different weighting configurations: the models are more accurate at detecting AI-generated images on redigital and transfer category, but they lose some performances at detecting real images in those same categories. 
 <a id="table_18"></a>
 <p align="center">
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_18.png" alt="loss weights" width="800">

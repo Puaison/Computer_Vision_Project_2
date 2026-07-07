@@ -191,7 +191,7 @@ The table below reports the weights tested and their nominal relative contributi
 ## Results and discussion
 This section follows the same order presented in the experimental roadmap. We are going to report not only performances, but also answers to the raised questions about our proposed model with DFT Stem and the interaction between the two tasks.
 
-### E1 -- Single Head Real/Ai Images Classification task
+### E1 - Single-Head Real/AI Images Classification task training
 The first experiments evaluates how models detect real/AI images under different post-processing transformations. We compare:
 - DRCTConvB with the original DRCT Base Checkpoint without additional fine-tuning;
 - DRCTConvB fine-tuned on our Dataset;
@@ -209,10 +209,10 @@ In fact, by looking at [table 3](#table_3) the DRCT Base Checkpoint predicts mos
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_3.png" alt="loss weights" width="800">
 </p>
 
-After fine-tuning, both DRCTConvB and DRCTConvB-DFT reach much stronger performances. Moreover we can assert that out proposed model slightly improves Real/AI detection accuracy despite it is less confident due to higher loss.  
+After fine-tuning, both DRCTConvB and DRCTConvB-DFT reach much stronger performance. Moreover, we can assert that our proposed model slightly improves Real/AI detection accuracy despite it is less confident due to higher loss.  
 
 
-By breaking down real/fake detection accuracy separately for each transformation category, the results for RGB-only checkpoint in [table 4](#table_4) and DFT checkpoint in [table 5](#table_5) suggest that both models behave differently w.r.t. post-processing condition, and in particular, they perform better in redigital category (w.r.t the original category) while perform less on the transfer category (in particular our proposed model)
+By breaking down real/fake detection accuracy separately for each transformation category, the results for RGB-only checkpoint in [table 4](#table_4) and DFT checkpoint in [table 5](#table_5) suggest that both models behave differently w.r.t. post-processing condition, and in particular, they perform better in redigital category (w.r.t the original category) while perform worse in the transfer category (in particular our proposed model)
 
 <a id="table_4"></a>
 <p align="center">
@@ -224,7 +224,7 @@ By breaking down real/fake detection accuracy separately for each transformation
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_5.png" alt="loss weights" width="800">
 </p>
 
-To verify if our proposed model (DRCTConvB-DFT) is really using the DFT Stem branch, we performed an ablation at test time: after training, we set the parameters of the parallel DFT branch to zero and we compared how the predictions in the test set changed. Results are reported in [table 6](#table_6) and [table 7](#table_7). It is possible to note that there is a slight improvement in the fake detection across all categories, but it strongly reduce accuracy score in the detection of real images across categories. This suggests that our proposed model is effectively using and learning the DFT Stem.
+To verify if our proposed model is really using the DFT Stem branch, we performed an ablation at test time: after training, we set the parameters of the parallel DFT branch to zero and we compared how the predictions in the test set changed. Differences are reported in [table 7](#table_7). It is possible to note that there is a slight improvement in the fake detection across all categories, but a strong reduction in accuracy score in the detection of real images across categories. This suggests that our proposed model is effectively using and learning the DFT Stem.
 <a id="table_6"></a>
 <p align="center">
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_6.png" alt="loss weights" width="800">
@@ -235,9 +235,9 @@ To verify if our proposed model (DRCTConvB-DFT) is really using the DFT Stem bra
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_7.png" alt="loss weights" width="800">
 </p>
 
-### E2 -- Multi-head category fine-tuning from class-task checkpoints
+### E2 - Multi-Head category fine-tuning from class-task checkpoints
 
-In this second experiment, we started from our checkpoints already trained on th real/AI task (RGB-Only Class Task Checkpoint and DFT Class Task Checkpoint) and added a second head for category classification. Then we compared the RGB-only DRCTConvB model with our proposed model DRCTConvB-DFT under the same fine-tuning procedure described in this [section](#multi-head-category-fine-tuning-strategy-from-class-task-checkpoints).
+In this second experiment, we started from our personal checkpoints outputted from the previous experiment that are already trained on the class task (RGB-Only Class Task Checkpoint and DFT Class Task Checkpoint) and added a second head for category classification. Then we compared the RGB-only DRCTConvB model with our proposed model DRCTConvB-DFT under the same fine-tuning procedure described in this [section](#multi-head-category-fine-tuning-strategy-from-class-task-checkpoints).
 
 The validation results are reported [table 8](#table_8). We can assert that the proposed model is slightly better in real/AI detection performances (despite it has more uncertainty), but the most important improvement appears in the category task. Thanks to the new DFT Stem branch, our model is hugely more accurated and balanced in category transformation recognition, with a **+18,37 percentage points in accuracy** and **+27,56 percentage points in F1-macro**.
 
@@ -255,7 +255,7 @@ In [table 9](#table_9) are also reported the metrics for Test set, that confirms
 From these first two experiments we can confirm that our proposed model is better than the base DRCT detector, and in particular frequency-domain informations are especially useful for recognizing post-processing transformations. This supports our initial hypothesis that such transformations can leave detectable signatures in the spectrum
 
 
-### E3 -- **SingleHead Category transformation detection task**:
+### E3 - **Single-Head Category task training**:
 
 In this experiment we studied if the category task benefits from representations previously learned for real/AI detection.
 
@@ -282,13 +282,9 @@ We discovered from this experiment two things at the same time:
 
 This motivates the use of a joint multi-head training combined loss.
 
-### E4 -- Joint training from a common initialization
+### E4 - Joint training from a common initialization
 
 In this experiment we trained the proposed DRCTConvB-DFT model from the DRCT Base Checkpoint using both heads at the same time with $w_{\mathrm{AI/R}} = 1$ and $w_{cat} = 1$. Then we compared this joint training with the corresponding single-head trainings starting from the same checkpoint (DRCT Base Checkpoint) and using the he same configurations and learning rates.
-
-
-
-Brief results: the joint training improve both the task with respect to two unimodal tasks that starts from the same inital point [DRCTConvB Base Checkpoint](https://drive.google.com/file/d/1LXLXAlsomU5o3AjauINmOlokSvJIGE0q/view?usp=drive_link)
 
 In [table 12](#table_12) and [table 13](#table_13) are reported the metrics respectively for validation and test set. Joint training improved both tha class task and the category, suggesting that both tasks can benefit from each other and provide complementary supervision when optimized together.
 <a id="table_12"></a>
@@ -306,7 +302,7 @@ By looking at [Table 14](#table_14) the Single-head model appears to be stronger
   <img src="https://github.com/Puaison/Computer_Vision_Project_2/blob/main/Images_GitHub/Tables/table_14.png" alt="loss weights" width="800">
 </p>
 
-### E5 -- Loss weight ablation
+### E5 - Loss weight ablation
 
 In the final experiment we studied how the realtive weight of the two lossess for the two tasks affects the trade-off between Real/AI detection and category classification. We kept $w_{\mathrm{AI/R}} = 1$ fixed and varied $w_{\mathrm{cat}}$.
 
